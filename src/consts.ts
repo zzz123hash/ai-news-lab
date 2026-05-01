@@ -1,6 +1,6 @@
 export const SITE_TITLE = 'OmniHex Lab';
 export const SITE_DESCRIPTION =
-	'面向 AI 新闻、教程、提示词、工具与小语种科技快报的低成本内容站。';
+	'面向 AI 新闻、教程、提示词、工具、小语种科技快报与 Life OS 行动指南的自动化内容站。';
 export const SITE_URL = 'https://lab.omnihex.xyz';
 
 export const CATEGORIES = [
@@ -35,10 +35,37 @@ export const CATEGORIES = [
 		description: '多语种 AI 与科技快报，适合后续接入 RSS 和自动发文流程。',
 	},
 	{
-		slug: 'rss',
-		name: 'RSS',
-		description: 'RSS、自动采集、自动投稿和内容流工作流记录。',
+		slug: 'life',
+		name: 'Life OS',
+		description: '小语种人生建议、自我提升、行动系统和数字生活方法。',
 	},
+	{
+		slug: 'guides',
+		name: 'Guides',
+		description: '可执行的人生重启、习惯重建、目标规划和 AI 自我教练指南。',
+	},
+	{
+		slug: 'products',
+		name: 'Products',
+		description: '围绕 Life OS 和 AI 工作流设计的数字产品、工作簿与模板。',
+	},
+	{
+		slug: 'books',
+		name: 'Books',
+		description:
+			'Reading Lab 将金融、理财、关系、自我成长、心理和决策类书籍转化为原创书评、行动建议和多语种应用指南。',
+	},
+] as const;
+
+export const NAV_LINKS = [
+	{ href: '/ai/', label: 'AI' },
+	{ href: '/news/', label: 'News' },
+	{ href: '/prompts/', label: 'Prompts' },
+	{ href: '/briefs/', label: 'Briefs' },
+	{ href: '/life/', label: 'Life OS' },
+	{ href: '/guides/', label: 'Guides' },
+	{ href: '/products/', label: 'Products' },
+	{ href: '/books/', label: 'Books' },
 ] as const;
 
 export const LANGUAGE_NAMES: Record<string, string> = {
@@ -46,6 +73,7 @@ export const LANGUAGE_NAMES: Record<string, string> = {
 	en: 'English',
 	id: 'Bahasa Indonesia',
 	pt: 'Português',
+	es: 'Español',
 };
 
 export type CategorySlug = (typeof CATEGORIES)[number]['slug'];

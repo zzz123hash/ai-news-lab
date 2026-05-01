@@ -1,0 +1,130 @@
+---
+import PageLayout from '../../../layouts/PageLayout.astro';
+
+const title = '90-Day Life Reset';
+const description =
+	'A practical PDF workbook for rebuilding your focus, habits, goals, and daily system in 90 days.';
+
+const included = [
+	'90-day action plan',
+	'weekly review template',
+	'habit tracker',
+	'AI self-coaching prompts',
+	'focus reset checklist',
+];
+---
+
+<PageLayout title={title} description={description}>
+	<section class="product-hero">
+		<p class="eyebrow">Life OS workbook</p>
+		<h1>{title}</h1>
+		<p>{description}</p>
+		<span>Coming soon</span>
+	</section>
+
+	<section class="product-details" aria-labelledby="includes-heading">
+		<h2 id="includes-heading">Included</h2>
+		<ul>
+			{included.map((item) => <li>{item}</li>)}
+		</ul>
+	</section>
+
+	<section class="subscribe" aria-labelledby="subscribe-heading">
+		<h2 id="subscribe-heading">Get notified</h2>
+		<p>Leave a place for the future email capture flow when the workbook is ready.</p>
+		<form>
+			<label>
+				<span>Email</span>
+				<input type="email" name="email" placeholder="you@example.com" disabled />
+			</label>
+			<button type="button" disabled>Coming soon</button>
+		</form>
+	</section>
+</PageLayout>
+
+<style>
+	.product-hero {
+		padding: 2rem 0 2.5rem;
+		border-bottom: 1px solid rgb(var(--gray-light));
+	}
+	.eyebrow {
+		margin: 0 0 0.5rem;
+		color: var(--accent-dark);
+		font-weight: 700;
+	}
+	.product-hero h1 {
+		max-width: 840px;
+		margin: 0 0 1rem;
+		font-size: clamp(2.4rem, 6vw, 4.4rem);
+	}
+	.product-hero p {
+		max-width: 720px;
+		color: rgb(var(--gray-dark));
+		font-size: 1.2rem;
+	}
+	.product-hero span {
+		display: inline-flex;
+		margin-top: 1rem;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 999px;
+		padding: 0.35rem 0.8rem;
+		color: rgb(var(--gray));
+		font-weight: 700;
+	}
+	.product-details,
+	.subscribe {
+		padding: 2rem 0;
+		border-bottom: 1px solid rgb(var(--gray-light));
+	}
+	.product-details h2,
+	.subscribe h2 {
+		margin: 0 0 1rem;
+		font-size: 1.6rem;
+	}
+	.product-details ul {
+		display: grid;
+		gap: 0.75rem;
+		max-width: 680px;
+		margin: 0;
+		padding-left: 1.25rem;
+		color: rgb(var(--gray-dark));
+	}
+	.subscribe p {
+		max-width: 620px;
+		color: rgb(var(--gray-dark));
+	}
+	form {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		align-items: end;
+		margin-top: 1rem;
+	}
+	label {
+		display: grid;
+		gap: 0.35rem;
+		min-width: min(100%, 280px);
+		color: rgb(var(--gray));
+		font-size: 0.9rem;
+		font-weight: 700;
+	}
+	input,
+	button {
+		min-height: 44px;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 8px;
+		padding: 0.65rem 0.8rem;
+		font: inherit;
+	}
+	input {
+		min-width: min(100%, 280px);
+		background: rgb(var(--gray-light));
+	}
+	button {
+		background: var(--accent);
+		color: white;
+		font-weight: 700;
+		cursor: not-allowed;
+		opacity: 0.7;
+	}
+</style>

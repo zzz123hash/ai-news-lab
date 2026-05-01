@@ -17,14 +17,32 @@ interface Props {
 
 const { category } = Astro.props;
 const posts = (await getPublishedPosts()).filter((post) => post.data.category === category.slug);
+const showProductFeature = category.slug === 'products';
+const showBooksIntro = category.slug === 'books';
 ---
 
 <PageLayout title={category.name} description={category.description}>
 	<section class="category-page">
 		<p class="eyebrow">/{category.slug}/</p>
 		<h1>{category.name}</h1>
-		<p>{category.description}</p>
+		<p>
+			{
+				showBooksIntro
+					? 'Reading Lab turns useful books into practical notes, action plans, and multilingual guides. We do not reproduce books; we create original commentary and application-focused guides.'
+					: category.description
+			}
+		</p>
 	</section>
+	{
+		showProductFeature && (
+			<section class="product-feature">
+				<p class="eyebrow">Coming soon</p>
+				<h2>90-Day Life Reset</h2>
+				<p>A practical PDF workbook for rebuilding your focus, habits, goals, and daily system in 90 days.</p>
+				<a href="/products/90-day-life-reset/">View product</a>
+			</section>
+		)
+	}
 	<PostList posts={posts} emptyMessage={`No published posts in ${category.name} yet.`} />
 </PageLayout>
 
@@ -44,5 +62,24 @@ const posts = (await getPublishedPosts()).filter((post) => post.data.category ==
 	.category-page p:last-child {
 		max-width: 720px;
 		color: rgb(var(--gray));
+	}
+	.product-feature {
+		border-top: 1px solid rgb(var(--gray-light));
+		border-bottom: 1px solid rgb(var(--gray-light));
+		margin: 2rem 0 0;
+		padding: 1.5rem 0;
+	}
+	.product-feature h2 {
+		margin: 0 0 0.5rem;
+		font-size: 1.8rem;
+	}
+	.product-feature p:not(.eyebrow) {
+		max-width: 680px;
+		margin-bottom: 1rem;
+		color: rgb(var(--gray-dark));
+	}
+	.product-feature a {
+		color: var(--accent-dark);
+		font-weight: 700;
 	}
 </style>

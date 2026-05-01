@@ -8,15 +8,28 @@ import Header from '../components/Header.astro';
 import { getCategoryBySlug, getLanguageName, SITE_TITLE } from '../consts';
 
 interface Props {
-	post: CollectionEntry<'blog'>;
+	post: CollectionEntry<'posts'>;
 	headings: MarkdownHeading[];
 }
 
 const { post, headings } = Astro.props;
-const { title, description, pubDate, category, tags, language, source, sourceUrl } = post.data;
+const {
+	title,
+	description,
+	pubDate,
+	category,
+	tags,
+	language,
+	source,
+	sourceUrl,
+	bookTitle,
+	bookAuthor,
+	bookCategory,
+} = post.data;
 const currentCategory = getCategoryBySlug(category);
 const toc = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3);
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const hasBookInfo = bookTitle || bookAuthor || bookCategory;
 const articleJsonLd = {
 	'@context': 'https://schema.org',
 	'@type': 'Article',
@@ -78,6 +91,34 @@ const articleJsonLd = {
 			}
 			.source {
 				margin-top: 0.75rem;
+			}
+			.book-info {
+				display: grid;
+				gap: 0.45rem;
+				margin-top: 1rem;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 8px;
+				padding: 1rem;
+				background: white;
+			}
+			.book-info h2 {
+				margin: 0;
+				font-size: 1rem;
+			}
+			.book-info dl {
+				display: grid;
+				gap: 0.35rem 1rem;
+				grid-template-columns: max-content 1fr;
+				margin: 0;
+				color: rgb(var(--gray));
+				font-size: 0.95rem;
+			}
+			.book-info dt {
+				font-weight: 700;
+			}
+			.book-info dd {
+				margin: 0;
+				color: rgb(var(--gray-dark));
 			}
 			.category-link {
 				color: var(--accent-dark);
@@ -176,6 +217,33 @@ const articleJsonLd = {
 										<span>{source}</span>
 									)}
 								</div>
+							)
+						}
+						{
+							hasBookInfo && (
+								<section class="book-info" aria-labelledby="book-info-heading">
+									<h2 id="book-info-heading">Book Info</h2>
+									<dl>
+										{bookTitle && (
+											<>
+												<dt>Title</dt>
+												<dd>{bookTitle}</dd>
+											</>
+										)}
+										{bookAuthor && (
+											<>
+												<dt>Author</dt>
+												<dd>{bookAuthor}</dd>
+											</>
+										)}
+										{bookCategory && (
+											<>
+												<dt>Category</dt>
+												<dd>{bookCategory}</dd>
+											</>
+										)}
+									</dl>
+								</section>
 							)
 						}
 						{tags.length > 0 && <ul class="tags">{tags.map((tag) => <li>{tag}</li>)}</ul>}

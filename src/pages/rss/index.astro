@@ -1,0 +1,40 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+
+const feedUrl = 'https://lab.omnihex.xyz/rss.xml';
+---
+
+<PageLayout title="RSS" description="RSS feed and automation entry points for OmniHex Lab.">
+	<section class="rss-page">
+		<p class="eyebrow">/rss/</p>
+		<h1>RSS and Automation</h1>
+		<p>
+			OmniHex Lab publishes a public RSS feed for all non-draft posts, including AI articles, tutorials,
+			prompts, tools, briefs, Life OS guides, and product notes.
+		</p>
+		<a href="/rss.xml">{feedUrl}</a>
+	</section>
+</PageLayout>
+
+<style>
+	.rss-page {
+		padding: 1rem 0 0.5rem;
+	}
+	.eyebrow {
+		margin: 0 0 0.5rem;
+		color: var(--accent-dark);
+		font-weight: 700;
+	}
+	.rss-page h1 {
+		margin-bottom: 0.75rem;
+		font-size: clamp(2rem, 5vw, 3.4rem);
+	}
+	.rss-page p {
+		max-width: 720px;
+		color: rgb(var(--gray));
+	}
+	.rss-page a {
+		color: var(--accent-dark);
+		font-weight: 700;
+	}
+</style>

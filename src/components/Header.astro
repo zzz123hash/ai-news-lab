@@ -1,11 +1,6 @@
 ---
-import { CATEGORIES, SITE_TITLE } from '../consts';
+import { NAV_LINKS, SITE_TITLE } from '../consts';
 import HeaderLink from './HeaderLink.astro';
-
-const pageLinks = [
-	{ href: '/about/', label: 'About' },
-	{ href: '/contact/', label: 'Contact' },
-];
 ---
 
 <header>
@@ -13,8 +8,7 @@ const pageLinks = [
 		<h2><a href="/">{SITE_TITLE}</a></h2>
 		<div class="internal-links">
 			<HeaderLink href="/">Home</HeaderLink>
-			{CATEGORIES.map((category) => <HeaderLink href={`/${category.slug}/`}>{category.name}</HeaderLink>)}
-			{pageLinks.map((link) => <HeaderLink href={link.href}>{link.label}</HeaderLink>)}
+			{NAV_LINKS.map((link) => <HeaderLink href={link.href}>{link.label}</HeaderLink>)}
 		</div>
 	</nav>
 </header>
