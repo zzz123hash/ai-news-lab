@@ -1,0 +1,56 @@
+---
+import PostList from '../../components/PostList.astro';
+import { getLanguageName } from '../../consts';
+import PageLayout from '../../layouts/PageLayout.astro';
+import { getPublishedPosts } from '../../utils/posts';
+
+const briefs = (await getPublishedPosts()).filter((post) => post.data.category === 'briefs');
+const languages = [...new Set(briefs.map((post) => post.data.language))].sort();
+---
+
+<PageLayout title="Briefs" description="Multilingual AI and technology briefs from OmniHex Lab.">
+	<section class="category-page">
+		<p class="eyebrow">/briefs/</p>
+		<h1>Multilingual Briefs</h1>
+		<p>多语种 AI 与科技快报，按语言聚合，适合后续接入 RSS、自动摘要和自动发文流程。</p>
+	</section>
+
+	{
+		languages.length > 0 ? (
+			languages.map((language) => (
+				<section class="language-group">
+					<h2>{getLanguageName(language)}</h2>
+					<PostList posts={briefs.filter((post) => post.data.language === language)} />
+				</section>
+			))
+		) : (
+			<p>No briefs published yet.</p>
+		)
+	}
+</PageLayout>
+
+<style>
+	.category-page {
+		padding: 1rem 0 0.5rem;
+	}
+	.eyebrow {
+		margin: 0 0 0.5rem;
+		color: var(--accent-dark);
+		font-weight: 700;
+	}
+	.category-page h1 {
+		margin-bottom: 0.75rem;
+		font-size: clamp(2rem, 5vw, 3.4rem);
+	}
+	.category-page p:last-child {
+		max-width: 720px;
+		color: rgb(var(--gray));
+	}
+	.language-group {
+		margin-top: 2.5rem;
+	}
+	.language-group h2 {
+		margin-bottom: 0;
+		font-size: 1.4rem;
+	}
+</style>

@@ -1,0 +1,91 @@
+---
+import PostList from '../components/PostList.astro';
+import { CATEGORIES, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import PageLayout from '../layouts/PageLayout.astro';
+import { getPublishedPosts } from '../utils/posts';
+
+const posts = await getPublishedPosts();
+const briefs = posts.filter((post) => post.data.category === 'briefs').slice(0, 6);
+const latestArticles = posts.filter((post) => post.data.category !== 'briefs').slice(0, 8);
+---
+
+<PageLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+	<section class="intro">
+		<p class="eyebrow">OmniHex Lab</p>
+		<h1>AI news, tutorials, prompts, tools, and multilingual tech briefs in one low-cost lab.</h1>
+		<p>
+			用 Astro + Markdown + Cloudflare Pages 搭建静态内容站，前期不依赖数据库和图片存储，同时保留 RSS、自动发文和 SEO 扩展空间。
+		</p>
+	</section>
+
+	<nav class="category-nav" aria-label="Content categories">
+		{CATEGORIES.map((category) => <a href={`/${category.slug}/`}>{category.name}</a>)}
+	</nav>
+
+	<section>
+		<div class="section-heading">
+			<h2>Latest Articles</h2>
+			<a href="/rss.xml">RSS feed</a>
+		</div>
+		<PostList posts={latestArticles} />
+	</section>
+
+	<section class="brief-section">
+		<div class="section-heading">
+			<h2>Latest Briefs</h2>
+			<a href="/briefs/">All briefs</a>
+		</div>
+		<PostList posts={briefs} emptyMessage="No briefs published yet." />
+	</section>
+</PageLayout>
+
+<style>
+	.intro {
+		padding: 2rem 0 1rem;
+	}
+	.eyebrow {
+		margin: 0 0 0.5rem;
+		color: var(--accent-dark);
+		font-weight: 700;
+	}
+	.intro h1 {
+		max-width: 920px;
+		margin-bottom: 1rem;
+		font-size: clamp(2.2rem, 5vw, 4rem);
+	}
+	.intro p:last-child {
+		max-width: 760px;
+		color: rgb(var(--gray));
+		font-size: 1.1rem;
+	}
+	.category-nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		margin: 1rem 0 3rem;
+		padding-bottom: 1.5rem;
+		border-bottom: 1px solid rgb(var(--gray-light));
+	}
+	.category-nav a {
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 999px;
+		padding: 0.35rem 0.8rem;
+		text-decoration: none;
+	}
+	.category-nav a:hover {
+		border-color: var(--accent);
+	}
+	.section-heading {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+	.section-heading h2 {
+		margin: 0;
+		font-size: 1.6rem;
+	}
+	.brief-section {
+		margin-top: 3rem;
+	}
+</style>

@@ -1,0 +1,48 @@
+---
+import PostList from '../../components/PostList.astro';
+import { CATEGORIES } from '../../consts';
+import PageLayout from '../../layouts/PageLayout.astro';
+import { getPublishedPosts } from '../../utils/posts';
+
+export function getStaticPaths() {
+	return CATEGORIES.filter((category) => category.slug !== 'briefs').map((category) => ({
+		params: { category: category.slug },
+		props: { category },
+	}));
+}
+
+interface Props {
+	category: (typeof CATEGORIES)[number];
+}
+
+const { category } = Astro.props;
+const posts = (await getPublishedPosts()).filter((post) => post.data.category === category.slug);
+---
+
+<PageLayout title={category.name} description={category.description}>
+	<section class="category-page">
+		<p class="eyebrow">/{category.slug}/</p>
+		<h1>{category.name}</h1>
+		<p>{category.description}</p>
+	</section>
+	<PostList posts={posts} emptyMessage={`No published posts in ${category.name} yet.`} />
+</PageLayout>
+
+<style>
+	.category-page {
+		padding: 1rem 0 0.5rem;
+	}
+	.eyebrow {
+		margin: 0 0 0.5rem;
+		color: var(--accent-dark);
+		font-weight: 700;
+	}
+	.category-page h1 {
+		margin-bottom: 0.75rem;
+		font-size: clamp(2rem, 5vw, 3.4rem);
+	}
+	.category-page p:last-child {
+		max-width: 720px;
+		color: rgb(var(--gray));
+	}
+</style>

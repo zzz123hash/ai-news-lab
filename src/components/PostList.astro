@@ -1,0 +1,92 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import FormattedDate from './FormattedDate.astro';
+import { getCategoryBySlug, getLanguageName } from '../consts';
+import { getPostUrl } from '../utils/posts';
+
+interface Props {
+	posts: CollectionEntry<'blog'>[];
+	emptyMessage?: string;
+}
+
+const { posts, emptyMessage = 'No published posts yet.' } = Astro.props;
+---
+
+{
+	posts.length > 0 ? (
+		<ol class="post-list">
+			{posts.map((post) => {
+				const category = getCategoryBySlug(post.data.category);
+
+				return (
+					<li>
+						<a href={getPostUrl(post)}>
+							<div class="post-kicker">
+								<span>{category?.name ?? post.data.category}</span>
+								<span>{getLanguageName(post.data.language)}</span>
+							</div>
+							<h2>{post.data.title}</h2>
+							<p>{post.data.description}</p>
+							<div class="post-meta">
+								<FormattedDate date={post.data.pubDate} />
+								{post.data.tags.length > 0 && <span>{post.data.tags.join(' / ')}</span>}
+							</div>
+						</a>
+					</li>
+				);
+			})}
+		</ol>
+	) : (
+		<p class="empty">{emptyMessage}</p>
+	)
+}
+
+<style>
+	.post-list {
+		display: grid;
+		gap: 1.25rem;
+		list-style: none;
+		margin: 2rem 0 0;
+		padding: 0;
+	}
+	.post-list li {
+		border-top: 1px solid rgb(var(--gray-light));
+	}
+	.post-list a {
+		display: block;
+		padding: 1.25rem 0;
+		text-decoration: none;
+	}
+	.post-list a:hover h2 {
+		color: var(--accent);
+	}
+	.post-kicker,
+	.post-meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1rem;
+		color: rgb(var(--gray));
+		font-size: 0.9rem;
+	}
+	.post-kicker span:first-child {
+		color: var(--accent-dark);
+		font-weight: 700;
+	}
+	.post-list h2 {
+		margin: 0.2rem 0 0.4rem;
+		font-size: 1.45rem;
+	}
+	.post-list p {
+		margin: 0;
+		color: rgb(var(--gray-dark));
+	}
+	.post-meta {
+		margin-top: 0.75rem;
+	}
+	.empty {
+		border-top: 1px solid rgb(var(--gray-light));
+		margin-top: 2rem;
+		padding-top: 1.5rem;
+		color: rgb(var(--gray));
+	}
+</style>

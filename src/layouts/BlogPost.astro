@@ -1,0 +1,203 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { MarkdownHeading } from 'astro';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Header from '../components/Header.astro';
+import { getCategoryBySlug, getLanguageName, SITE_TITLE } from '../consts';
+
+interface Props {
+	post: CollectionEntry<'blog'>;
+	headings: MarkdownHeading[];
+}
+
+const { post, headings } = Astro.props;
+const { title, description, pubDate, category, tags, language, source, sourceUrl } = post.data;
+const currentCategory = getCategoryBySlug(category);
+const toc = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3);
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const articleJsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'Article',
+	headline: title,
+	description,
+	inLanguage: language,
+	datePublished: pubDate.toISOString(),
+	mainEntityOfPage: canonicalURL.toString(),
+	author: {
+		'@type': 'Organization',
+		name: SITE_TITLE,
+	},
+	publisher: {
+		'@type': 'Organization',
+		name: SITE_TITLE,
+	},
+	keywords: tags,
+	isBasedOn: sourceUrl,
+};
+---
+
+<!doctype html>
+<html lang={language}>
+	<head>
+		<BaseHead title={title} description={description} type="article" />
+		<script type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} />
+		<style>
+			main {
+				width: min(100% - 2rem, 1120px);
+				max-width: 1120px;
+				margin: auto;
+				padding: 3rem 0;
+			}
+			.prose {
+				width: min(100%, 760px);
+				color: rgb(var(--gray-dark));
+			}
+			.title {
+				margin-bottom: 2rem;
+				padding-bottom: 1.5rem;
+				border-bottom: 1px solid rgb(var(--gray-light));
+			}
+			.title h1 {
+				margin: 0 0 0.75rem;
+				font-size: clamp(2rem, 5vw, 3.2rem);
+			}
+			.description {
+				margin: 0 0 1rem;
+				color: rgb(var(--gray-dark));
+				font-size: 1.15rem;
+			}
+			.meta,
+			.source {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem 1rem;
+				color: rgb(var(--gray));
+				font-size: 0.95rem;
+			}
+			.source {
+				margin-top: 0.75rem;
+			}
+			.category-link {
+				color: var(--accent-dark);
+				font-weight: 700;
+				text-decoration: none;
+			}
+			.tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+				margin: 1rem 0 0;
+				padding: 0;
+				list-style: none;
+			}
+			.tags li {
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 999px;
+				padding: 0.15rem 0.55rem;
+				color: rgb(var(--gray));
+				font-size: 0.85rem;
+			}
+			.article-grid {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) 240px;
+				gap: 3rem;
+				align-items: start;
+			}
+			.toc {
+				position: sticky;
+				top: 1rem;
+				border-left: 1px solid rgb(var(--gray-light));
+				padding-left: 1rem;
+				color: rgb(var(--gray));
+				font-size: 0.9rem;
+			}
+			.toc h2 {
+				margin: 0 0 0.75rem;
+				font-size: 1rem;
+			}
+			.toc ol {
+				display: grid;
+				gap: 0.45rem;
+				list-style: none;
+				margin: 0;
+				padding: 0;
+			}
+			.toc a {
+				color: rgb(var(--gray));
+				text-decoration: none;
+			}
+			.toc a:hover {
+				color: var(--accent);
+			}
+			.toc .depth-3 {
+				padding-left: 0.9rem;
+			}
+			@media (max-width: 900px) {
+				main {
+					padding: 2rem 0;
+				}
+				.article-grid {
+					grid-template-columns: 1fr;
+					gap: 1.5rem;
+				}
+				.toc {
+					position: static;
+					border-left: 0;
+					border-top: 1px solid rgb(var(--gray-light));
+					padding: 1rem 0 0;
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<Header />
+		<main>
+			<div class="article-grid">
+				<article class="prose">
+					<div class="title">
+						<a class="category-link" href={`/${category}/`}>{currentCategory?.name ?? category}</a>
+						<h1>{title}</h1>
+						<p class="description">{description}</p>
+						<div class="meta">
+							<FormattedDate date={pubDate} />
+							<span>{getLanguageName(language)}</span>
+							<span>{tags.length} tags</span>
+						</div>
+						{
+							source && (
+								<div class="source">
+									<span>Source:</span>
+									{sourceUrl ? (
+										<a href={sourceUrl} target="_blank" rel="noopener noreferrer">{source}</a>
+									) : (
+										<span>{source}</span>
+									)}
+								</div>
+							)
+						}
+						{tags.length > 0 && <ul class="tags">{tags.map((tag) => <li>{tag}</li>)}</ul>}
+					</div>
+					<slot />
+				</article>
+				{
+					toc.length > 0 && (
+						<aside class="toc" aria-label="Table of contents">
+							<h2>Contents</h2>
+							<ol>
+								{toc.map((heading) => (
+									<li class={`depth-${heading.depth}`}>
+										<a href={`#${heading.slug}`}>{heading.text}</a>
+									</li>
+								))}
+							</ol>
+						</aside>
+					)
+				}
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>
