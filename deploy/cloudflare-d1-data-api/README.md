@@ -36,7 +36,23 @@ The Worker only sends CORS headers for:
 - `https://lab.omnihex.xyz`
 - `http://localhost:4321`
 
-## Create the D1 database
+## D1 database
+
+This Worker is configured for the existing Cloudflare D1 database:
+
+- Database name: `omnihex-data-api`
+- Database UUID: `17629af4-c8bd-4001-a4d6-3e99b820ddb1`
+
+The binding in `wrangler.toml` is:
+
+```toml
+[[d1_databases]]
+binding = "DB"
+database_name = "omnihex-data-api"
+database_id = "17629af4-c8bd-4001-a4d6-3e99b820ddb1"
+```
+
+## Install dependencies
 
 Install dependencies first:
 
@@ -50,33 +66,18 @@ Log in to Cloudflare if needed:
 npx wrangler login
 ```
 
-Create the D1 database:
-
-```bash
-npx wrangler d1 create omnihex_data
-```
-
-Copy the returned `database_id` into `wrangler.toml`:
-
-```toml
-[[d1_databases]]
-binding = "DB"
-database_name = "omnihex_data"
-database_id = "YOUR_DATABASE_ID"
-```
-
 ## Apply the schema
 
 For a local D1 database:
 
 ```bash
-npx wrangler d1 execute omnihex_data --local --file=./schema.sql
+npx wrangler d1 execute omnihex-data-api --local --file=./schema.sql
 ```
 
 For the remote production D1 database:
 
 ```bash
-npx wrangler d1 execute omnihex_data --remote --file=./schema.sql
+npx wrangler d1 execute omnihex-data-api --remote --file=./schema.sql
 ```
 
 ## Run locally
@@ -166,7 +167,7 @@ curl "http://localhost:8787/unsubscribe?email=reader@example.com&token=YOUR_UNSU
 The schema does not seed notifications. Add one manually when testing feed behavior:
 
 ```bash
-npx wrangler d1 execute omnihex_data --local --command "INSERT INTO notifications (id, kind, title, summary, url, category, language, topic_key, plan_visibility, status, published_at, created_at) VALUES ('test-notification-1', 'signal', 'Test signal', 'A local D1 feed item.', 'https://lab.omnihex.xyz/', 'briefs', 'en', 'ai-agents', 'free', 'published', datetime('now'), datetime('now'));"
+npx wrangler d1 execute omnihex-data-api --local --command "INSERT INTO notifications (id, kind, title, summary, url, category, language, topic_key, plan_visibility, status, published_at, created_at) VALUES ('test-notification-1', 'signal', 'Test signal', 'A local D1 feed item.', 'https://lab.omnihex.xyz/', 'briefs', 'en', 'ai-agents', 'free', 'published', datetime('now'), datetime('now'));"
 ```
 
 ## Notes

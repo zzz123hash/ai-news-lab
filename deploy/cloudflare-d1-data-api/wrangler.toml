@@ -5,8 +5,8 @@ workers_dev = true
 
 [[d1_databases]]
 binding = "DB"
-database_name = "omnihex_data"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
+database_name = "omnihex-data-api"
+database_id = "17629af4-c8bd-4001-a4d6-3e99b820ddb1"
 
 # After the Worker is deployed, bind data.lab.omnihex.xyz in the Cloudflare
 # dashboard or replace this with the route/custom domain config used by the
