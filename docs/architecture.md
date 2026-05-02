@@ -16,8 +16,8 @@ This setup keeps the first version low-cost, easy to deploy, and simple to audit
 The near-term plan keeps the public site stable while preparing server-side services:
 
 - `lab.omnihex.xyz` remains on Cloudflare Pages.
-- `api.omnihex.xyz` will point to a future VPS backend.
-- `admin.omnihex.xyz` will point to a future VPS admin app.
+- `api.lab.omnihex.xyz` will point to a future VPS backend.
+- `admin.lab.omnihex.xyz` will point to a future VPS admin app.
 - NAS is used only for backup and cold storage.
 
 The NAS should not be treated as the primary application server. It is a storage layer for archives, database backups, exports, and cold recovery copies.
@@ -44,6 +44,7 @@ Migration should preserve portability and avoid infrastructure lock-in:
 
 - Use environment variables for secrets, endpoints, tokens, and deployment-specific configuration.
 - Avoid hardcoded server IPs in code, content, or client-side configuration.
+- Use project-scoped subdomains for dynamic services: `api.lab.omnihex.xyz` and `admin.lab.omnihex.xyz`.
 - Keep code in GitHub as the source of truth for application code and infrastructure notes.
 - Backup database data on a regular schedule and test recovery procedures.
 - Keep front-end and backend decoupled so `lab.omnihex.xyz` can stay static while APIs evolve.

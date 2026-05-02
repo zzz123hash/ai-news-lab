@@ -8,6 +8,16 @@ Production domain:
 https://lab.omnihex.xyz
 ```
 
+Dynamic service domains:
+
+```text
+Frontend: https://lab.omnihex.xyz
+API: https://api.lab.omnihex.xyz
+Admin: https://admin.lab.omnihex.xyz
+```
+
+The current public front-end stays on Cloudflare Pages at `lab.omnihex.xyz`. Future dynamic services should use project-scoped subdomains under `lab.omnihex.xyz`.
+
 ## Stack
 
 - Astro
@@ -118,6 +128,7 @@ The production output is generated in `dist/`.
 - `/admin` is a private admin workspace entry point.
 - `/admin/new` posts single-language drafts to `/api/posts`.
 - `/admin/inbox` and `/admin/ideas` are UI-only placeholders.
+- Future hosted admin service should use `https://admin.lab.omnihex.xyz`.
 - It does not store tokens.
 - AI generation, source collection, user personalization, and paid features will be added later.
 - Current publishing boundary is `POST /api/posts`.
@@ -142,6 +153,15 @@ GITHUB_BRANCH=main
 ```
 
 `GITHUB_BRANCH` defaults to `main` when omitted.
+
+Future VPS-backed service environment variables should use project-scoped service URLs:
+
+```text
+PUBLIC_API_BASE_URL=https://api.lab.omnihex.xyz
+PUBLIC_ADMIN_BASE_URL=https://admin.lab.omnihex.xyz
+```
+
+Do not use server IP addresses in front-end code or documentation examples. Keep the `lab.omnihex.xyz` Cloudflare Pages deployment unchanged while future dynamic services move behind `api.lab.omnihex.xyz` and `admin.lab.omnihex.xyz`.
 
 ## API
 
