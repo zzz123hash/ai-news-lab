@@ -10,15 +10,17 @@ src/content/posts/*.md
 
 It does not use a database, payment provider, real AI integration, or the paused custom `server/` admin as a CMS.
 
+The old Astro `/admin/` prototype is deprecated and should not be used as the main CMS. It is left in the repo for now to avoid a broad route cleanup.
+
 ## Open the CMS
 
 Production URL:
 
 ```text
-https://lab.omnihex.xyz/admin/
+https://lab.omnihex.xyz/cms/
 ```
 
-`/admin/` is now the Sveltia CMS entry. Older Astro admin prototype subroutes may still exist in the repo during the transition, but they should not be treated as the main CMS.
+`/cms/` is the Sveltia CMS entry. `/admin/` is the deprecated Astro prototype.
 
 Local URL after starting Astro:
 
@@ -27,13 +29,13 @@ npm run dev
 ```
 
 ```text
-http://localhost:4321/admin/
+http://localhost:4321/cms/
 ```
 
 The CMS config is served from:
 
 ```text
-/admin/config.yml
+/cms/config.yml
 ```
 
 ## GitHub Access
@@ -48,7 +50,7 @@ First production use requires GitHub authentication support for Sveltia/Decap. I
 
 ## Edit an Existing Article
 
-1. Open `/admin/`.
+1. Open `/cms/`.
 2. Choose `Posts`.
 3. Select an existing Markdown post.
 4. Edit fields such as title, description, category, language, tags, draft, access, and body.
@@ -57,7 +59,7 @@ First production use requires GitHub authentication support for Sveltia/Decap. I
 
 ## Create a Draft
 
-1. Open `/admin/`.
+1. Open `/cms/`.
 2. Choose `Posts`.
 3. Click `New Post`.
 4. Fill in:
