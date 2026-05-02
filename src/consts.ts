@@ -61,7 +61,7 @@ export const NAV_LINKS = [
 	{ href: '/briefs/', label: 'Briefs' },
 	{ href: '/prompts/', label: 'Prompts' },
 	{ href: '/life/', label: 'Life OS' },
-	{ href: '/subscribe/', label: 'Subscribe' },
+	{ href: '/subscribe', label: 'Subscribe' },
 	{ href: '/api/', label: 'API' },
 	{ href: '/about/', label: 'About' },
 ] as const;

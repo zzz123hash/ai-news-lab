@@ -1,26 +1,248 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
+
+const topics = [
+	{ value: 'ai-news', label: 'AI news' },
+	{ value: 'prompts', label: 'Prompts' },
+	{ value: 'life-os', label: 'Life OS' },
+	{ value: 'automation', label: 'Automation' },
+	{ value: 'api', label: 'API' },
+];
+
+const languages = [
+	{ value: 'en', label: 'English' },
+	{ value: 'zh', label: 'Chinese' },
+	{ value: 'es', label: 'Spanish' },
+	{ value: 'pt', label: 'Portuguese' },
+	{ value: 'id', label: 'Indonesian' },
+];
 ---
 
 <PageLayout
 	title="Subscribe"
-	description="Follow OmniHex Lab briefs, prompt templates, and Life OS guides."
+	description="Subscribe to OmniHex Lab updates and receive API access."
 >
 	<section class="page subscribe-page">
-		<p class="eyebrow">/subscribe/</p>
+		<p class="eyebrow">/subscribe</p>
 		<h1>Subscribe to OmniHex Lab</h1>
-		<p>
-			Follow focused updates on multilingual AI briefs, reusable prompt patterns, and practical Life OS guides.
+		<p class="intro-copy">
+			Choose the updates you want and receive an API key for OmniHex Lab data access.
 		</p>
-		<p>
-			The first public subscription channel is RSS. Email subscriptions can be added after the publishing rhythm is stable.
-		</p>
-		<div class="actions">
-			<a class="button" href="/rss.xml">Open RSS feed</a>
-			<a href="/briefs/">Browse latest briefs</a>
+
+		<div class="subscribe-grid">
+			<form class="subscribe-form" data-subscribe-form>
+				<div class="form-row">
+					<label for="email">Email</label>
+					<input
+						id="email"
+						name="email"
+						type="email"
+						autocomplete="email"
+						placeholder="you@example.com"
+						required
+					/>
+				</div>
+
+				<fieldset>
+					<legend>Topics</legend>
+					<div class="option-grid">
+						{
+							topics.map((topic, index) => (
+								<label class="option">
+									<input
+										type="checkbox"
+										name="topics"
+										value={topic.value}
+										checked={index < 2}
+									/>
+									<span>{topic.label}</span>
+									<code>{topic.value}</code>
+								</label>
+							))
+						}
+					</div>
+				</fieldset>
+
+				<fieldset>
+					<legend>Languages</legend>
+					<div class="option-grid language-options">
+						{
+							languages.map((language, index) => (
+								<label class="option">
+									<input
+										type="checkbox"
+										name="languages"
+										value={language.value}
+										checked={index < 2}
+									/>
+									<span>{language.label}</span>
+									<code>{language.value}</code>
+								</label>
+							))
+						}
+					</div>
+				</fieldset>
+
+				<div class="form-actions">
+					<button type="submit" data-submit-button>Subscribe</button>
+					<p class="form-note">No login, payment, or social sign-in is required.</p>
+				</div>
+
+				<p class="status-message" data-status-message aria-live="polite"></p>
+			</form>
+
+			<aside class="explanation" aria-labelledby="subscription-access-heading">
+				<h2 id="subscription-access-heading">Access notes</h2>
+				<ul>
+					<li>Free subscription includes API access.</li>
+					<li>Pro is reserved for future ad-free and higher-limit access.</li>
+					<li>The public site remains free to read.</li>
+				</ul>
+			</aside>
 		</div>
+
+		<section class="result-panel" data-result-panel hidden aria-labelledby="api-key-heading">
+			<div>
+				<p class="eyebrow">API access</p>
+				<h2 id="api-key-heading">Subscription created</h2>
+				<p class="once-note">This key is shown only once. Save it now.</p>
+			</div>
+
+			<dl class="result-list">
+				<div>
+					<dt>API Key</dt>
+					<dd><code data-api-key></code></dd>
+				</div>
+				<div>
+					<dt>dailyLimit</dt>
+					<dd data-daily-limit></dd>
+				</div>
+				<div>
+					<dt>unsubscribeUrl</dt>
+					<dd><a data-unsubscribe-url target="_blank" rel="noopener noreferrer"></a></dd>
+				</div>
+			</dl>
+		</section>
 	</section>
 </PageLayout>
+
+<script is:inline>
+	const endpoint = 'https://data.lab.omnihex.xyz/subscribe';
+	const form = document.querySelector('[data-subscribe-form]');
+	const submitButton = document.querySelector('[data-submit-button]');
+	const statusMessage = document.querySelector('[data-status-message]');
+	const resultPanel = document.querySelector('[data-result-panel]');
+	const apiKeyOutput = document.querySelector('[data-api-key]');
+	const dailyLimitOutput = document.querySelector('[data-daily-limit]');
+	const unsubscribeUrlOutput = document.querySelector('[data-unsubscribe-url]');
+
+	function getCheckedValues(name) {
+		return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map((input) => input.value);
+	}
+
+	function setStatus(message, type) {
+		statusMessage.textContent = message;
+		statusMessage.dataset.state = type;
+	}
+
+	function clearResult() {
+		resultPanel.hidden = true;
+		apiKeyOutput.textContent = '';
+		dailyLimitOutput.textContent = '';
+		unsubscribeUrlOutput.textContent = '';
+		unsubscribeUrlOutput.removeAttribute('href');
+	}
+
+	async function readPayload(response) {
+		const contentType = response.headers.get('content-type') || '';
+
+		if (contentType.includes('application/json')) {
+			return response.json();
+		}
+
+		const text = await response.text();
+		return text ? { message: text } : {};
+	}
+
+	function getPayloadValue(payload, camelName, snakeName) {
+		return payload?.[camelName] ?? payload?.[snakeName] ?? payload?.data?.[camelName] ?? payload?.data?.[snakeName];
+	}
+
+	form?.addEventListener('submit', async (event) => {
+		event.preventDefault();
+		clearResult();
+
+		const formData = new FormData(form);
+		const email = formData.get('email')?.toString().trim();
+		const selectedTopics = getCheckedValues('topics');
+		const selectedLanguages = getCheckedValues('languages');
+
+		if (!email) {
+			setStatus('Please enter a valid email address.', 'error');
+			return;
+		}
+
+		if (selectedTopics.length === 0) {
+			setStatus('Choose at least one topic.', 'error');
+			return;
+		}
+
+		if (selectedLanguages.length === 0) {
+			setStatus('Choose at least one language.', 'error');
+			return;
+		}
+
+		submitButton.disabled = true;
+		setStatus('Creating your subscription...', 'pending');
+
+		try {
+			const response = await fetch(endpoint, {
+				method: 'POST',
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					email,
+					topics: selectedTopics,
+					languages: selectedLanguages,
+					source: 'subscribe-page',
+				}),
+			});
+			const payload = await readPayload(response);
+
+			if (!response.ok || payload?.ok === false) {
+				throw new Error(payload?.error || payload?.message || 'The subscription service could not complete the request.');
+			}
+
+			const apiKey = getPayloadValue(payload, 'apiKey', 'api_key') ?? getPayloadValue(payload, 'key', 'key');
+			const dailyLimit = getPayloadValue(payload, 'dailyLimit', 'daily_limit');
+			const unsubscribeUrl = getPayloadValue(payload, 'unsubscribeUrl', 'unsubscribe_url');
+
+			if (!apiKey) {
+				throw new Error('The subscription was created, but the API key was not returned. Please contact OmniHex Lab support.');
+			}
+
+			apiKeyOutput.textContent = apiKey;
+			dailyLimitOutput.textContent = dailyLimit ?? 'Not provided';
+
+			if (unsubscribeUrl) {
+				unsubscribeUrlOutput.textContent = unsubscribeUrl;
+				unsubscribeUrlOutput.href = unsubscribeUrl;
+			} else {
+				unsubscribeUrlOutput.textContent = 'Not provided';
+			}
+
+			resultPanel.hidden = false;
+			setStatus('Subscription created.', 'success');
+		} catch (error) {
+			const detail = error instanceof Error ? error.message : 'Please try again later.';
+			setStatus(`We could not create the subscription. ${detail}`, 'error');
+		} finally {
+			submitButton.disabled = false;
+		}
+	});
+</script>
 
 <style>
 	.subscribe-page {
@@ -32,30 +254,194 @@ import PageLayout from '../layouts/PageLayout.astro';
 		font-weight: 700;
 	}
 	.subscribe-page h1 {
+		max-width: 840px;
+		margin-bottom: 1rem;
 		font-size: clamp(2rem, 5vw, 3.2rem);
 	}
-	.subscribe-page p {
+	.intro-copy {
 		max-width: 720px;
 		color: rgb(var(--gray));
+		font-size: 1.05rem;
 	}
-	.actions {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 0.9rem;
-		margin-top: 1.4rem;
+	.subscribe-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(240px, 0.42fr);
+		gap: 2rem;
+		align-items: start;
+		margin-top: 2rem;
 	}
-	.actions a {
+	.subscribe-form {
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 8px;
+		padding: 1.4rem;
+		background: white;
+		box-shadow: 0 10px 30px rgba(var(--black), 5%);
+	}
+	.form-row,
+	fieldset {
+		margin: 0 0 1.35rem;
+	}
+	label,
+	legend {
+		color: rgb(var(--gray-dark));
 		font-weight: 700;
 	}
-	.actions .button {
+	.form-row label,
+	legend {
+		display: block;
+		margin-bottom: 0.6rem;
+	}
+	input[type='email'] {
+		width: 100%;
+		box-sizing: border-box;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 6px;
+		padding: 0.75rem 0.85rem;
+		color: rgb(var(--black));
+		font: inherit;
+	}
+	input[type='email']:focus {
+		outline: 2px solid var(--accent);
+		outline-offset: 2px;
+	}
+	fieldset {
+		border: 0;
+		padding: 0;
+	}
+	.option-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+		gap: 0.75rem;
+	}
+	.language-options {
+		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+	}
+	.option {
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		gap: 0.55rem;
+		align-items: center;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 6px;
+		padding: 0.7rem;
+		font-weight: 600;
+		cursor: pointer;
+	}
+	.option:has(input:checked) {
+		border-color: var(--accent);
+		background: rgba(37, 99, 235, 0.08);
+	}
+	.option input {
+		margin: 0;
+	}
+	.option code {
+		color: rgb(var(--gray));
+		font-size: 0.78rem;
+	}
+	.form-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.9rem;
+		align-items: center;
+	}
+	button {
+		border: 0;
 		border-radius: 6px;
 		background: var(--accent);
-		padding: 0.55rem 0.9rem;
+		padding: 0.7rem 1rem;
 		color: white;
-		text-decoration: none;
+		font: inherit;
+		font-weight: 700;
+		cursor: pointer;
 	}
-	.actions .button:hover {
+	button:hover {
 		background: var(--accent-dark);
+	}
+	button:disabled {
+		cursor: progress;
+		opacity: 0.68;
+	}
+	.form-note,
+	.status-message {
+		margin: 0;
+		color: rgb(var(--gray));
+	}
+	.status-message {
+		margin-top: 1rem;
+		font-weight: 700;
+	}
+	.status-message[data-state='success'] {
+		color: #197245;
+	}
+	.status-message[data-state='error'] {
+		color: #9f2d2d;
+	}
+	.explanation {
+		border-top: 1px solid rgb(var(--gray-light));
+		padding-top: 1rem;
+	}
+	.explanation h2 {
+		margin: 0 0 0.75rem;
+		font-size: 1.3rem;
+	}
+	.explanation ul {
+		display: grid;
+		gap: 0.7rem;
+		margin: 0;
+		padding-left: 1.2rem;
+		color: rgb(var(--gray));
+	}
+	.result-panel {
+		border-top: 1px solid rgb(var(--gray-light));
+		margin-top: 2rem;
+		padding-top: 2rem;
+	}
+	.result-panel h2 {
+		margin: 0 0 0.5rem;
+		font-size: 1.6rem;
+	}
+	.once-note {
+		margin: 0;
+		color: #9f2d2d;
+		font-weight: 700;
+	}
+	.result-list {
+		display: grid;
+		gap: 0.9rem;
+		margin: 1.2rem 0 0;
+	}
+	.result-list div {
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 6px;
+		padding: 0.8rem;
+	}
+	.result-list dt {
+		margin-bottom: 0.35rem;
+		color: rgb(var(--gray));
+		font-size: 0.85rem;
+		font-weight: 700;
+	}
+	.result-list dd {
+		margin: 0;
+		overflow-wrap: anywhere;
+		color: rgb(var(--black));
+	}
+	.result-list code {
+		color: rgb(var(--black));
+		font-size: 0.95rem;
+	}
+	@media (max-width: 780px) {
+		.subscribe-grid {
+			grid-template-columns: 1fr;
+		}
+		.subscribe-form {
+			padding: 1rem;
+		}
+		.option {
+			grid-template-columns: auto 1fr;
+		}
+		.option code {
+			grid-column: 2;
+		}
 	}
 </style>
