@@ -1,0 +1,14 @@
+name = "omnihex-d1-data-api"
+main = "src/index.ts"
+compatibility_date = "2026-05-02"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "omnihex_data"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+
+# After the Worker is deployed, bind data.lab.omnihex.xyz in the Cloudflare
+# dashboard or replace this with the route/custom domain config used by the
+# production account.
+# routes = [{ pattern = "data.lab.omnihex.xyz/*", custom_domain = true }]
