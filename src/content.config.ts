@@ -5,8 +5,8 @@ import { z } from 'astro/zod';
 const posts = defineCollection({
 	loader: glob({ base: './src/content/posts', pattern: '**/*.md' }),
 	schema: z.object({
-		title: z.string(),
-		description: z.string(),
+		title: z.string().trim().min(1),
+		description: z.string().trim().min(1),
 		pubDate: z.coerce.date(),
 		category: z.enum([
 			'ai',
