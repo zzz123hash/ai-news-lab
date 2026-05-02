@@ -1,37 +1,40 @@
 <section class="dynamic-signals" aria-labelledby="dynamic-signals-heading" data-dynamic-signals>
 	<div class="signals-header">
 		<p class="signals-eyebrow">AI Signals</p>
-		<h2 id="dynamic-signals-heading">What to explore next</h2>
+		<h2 id="dynamic-signals-heading">Dynamic AI Signals</h2>
 	</div>
 	<p class="signals-status" data-signals-status>Checking for fresh signals...</p>
 	<ul class="signals-list" data-signals-list>
-		<li>Explore the latest AI briefs, prompts, and Life OS guides.</li>
+		<li class="signals-fallback">Explore the latest AI briefs, prompts, and Life OS guides.</li>
 	</ul>
 </section>
 
 <script>
 	const SIGNALS_ENDPOINT = 'https://api.lab.omnihex.xyz/public/signals';
 	const SIGNALS_TIMEOUT_MS = 3000;
-	const FALLBACK_SIGNALS = ['Explore the latest AI briefs, prompts, and Life OS guides.'];
+	const FALLBACK_TEXT = 'Explore the latest AI briefs, prompts, and Life OS guides.';
 
 	function normalizeSignals(payload) {
-		const rawSignals = Array.isArray(payload)
-			? payload
-			: Array.isArray(payload?.signals)
-				? payload.signals
-				: [];
+		if (!payload || payload.ok !== true || !Array.isArray(payload.signals)) {
+			return [];
+		}
 
-		return rawSignals
+		return payload.signals
 			.map((signal) => {
-				if (typeof signal === 'string') {
-					return signal.trim();
+				if (!signal || typeof signal !== 'object') {
+					return null;
 				}
 
-				if (signal && typeof signal === 'object') {
-					return String(signal.title ?? signal.text ?? signal.label ?? '').trim();
+				const title = String(signal.title ?? '').trim();
+				const summary = String(signal.summary ?? '').trim();
+				const category = String(signal.category ?? '').trim();
+				const language = String(signal.language ?? '').trim();
+
+				if (!title || !summary) {
+					return null;
 				}
 
-				return '';
+				return { title, summary, category, language };
 			})
 			.filter(Boolean)
 			.slice(0, 5);
@@ -40,10 +43,34 @@
 	function renderSignals(list, signals) {
 		list.replaceChildren(...signals.map((signal) => {
 			const item = document.createElement('li');
-			item.textContent = signal;
+			item.className = 'signals-card';
+
+			const title = document.createElement('strong');
+			title.textContent = signal.title;
+			item.append(title);
+
+			const summary = document.createElement('p');
+			summary.textContent = signal.summary;
+			item.append(summary);
+
+			const metaParts = [signal.category, signal.language].filter(Boolean);
+
+			if (metaParts.length > 0) {
+				const meta = document.createElement('span');
+				meta.className = 'signals-meta';
+				meta.textContent = metaParts.join(' / ');
+				item.append(meta);
+			}
 
 			return item;
 		}));
+	}
+
+	function renderFallback(list) {
+		const item = document.createElement('li');
+		item.className = 'signals-fallback';
+		item.textContent = FALLBACK_TEXT;
+		list.replaceChildren(item);
 	}
 
 	async function loadSignals(root) {
@@ -77,7 +104,7 @@
 			status.textContent = 'Fresh signals loaded.';
 			root.dataset.state = 'loaded';
 		} catch {
-			renderSignals(list, FALLBACK_SIGNALS);
+			renderFallback(list);
 			status.textContent = 'Static signals available.';
 			root.dataset.state = 'fallback';
 		} finally {
@@ -149,6 +176,31 @@
 		border-left: 3px solid var(--accent);
 		padding-left: 0.75rem;
 		color: rgb(var(--gray-dark));
+	}
+
+	.signals-card {
+		display: grid;
+		gap: 0.25rem;
+	}
+
+	.signals-card strong {
+		color: rgb(var(--black));
+		line-height: 1.3;
+	}
+
+	.signals-card p {
+		margin: 0;
+		color: rgb(var(--gray));
+		font-size: 0.95rem;
+		line-height: 1.55;
+	}
+
+	.signals-meta {
+		color: var(--accent-dark);
+		font-size: 0.78rem;
+		font-weight: 700;
+		letter-spacing: 0.02em;
+		text-transform: uppercase;
 	}
 
 	.dynamic-signals:not([data-state]) .signals-status::after {
