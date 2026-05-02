@@ -105,6 +105,42 @@ Expected response:
 }
 ```
 
+Public signals:
+
+```sh
+curl http://127.0.0.1:3000/public/signals
+```
+
+`/public/signals` is the first dynamic front-end enhancement endpoint for OmniHex Lab. The static Cloudflare Pages front-end can request it from `https://api.lab.omnihex.xyz/public/signals` to enrich the homepage while keeping the core page content static and fallback-safe.
+
+Current mock response:
+
+```json
+{
+  "ok": true,
+  "signals": [
+    {
+      "title": "AI workflows are becoming personal operating systems",
+      "summary": "More creators are turning AI prompts, notes, and automations into repeatable daily systems.",
+      "category": "life",
+      "language": "en"
+    },
+    {
+      "title": "Multilingual AI content remains underexplored",
+      "summary": "Small-language AI tutorials and briefs may have lower SEO competition than English and Chinese content.",
+      "category": "briefs",
+      "language": "en"
+    },
+    {
+      "title": "Prompt libraries can become lightweight digital products",
+      "summary": "Practical prompt collections can support affiliate, subscription, or PDF product experiments.",
+      "category": "prompts",
+      "language": "en"
+    }
+  ]
+}
+```
+
 After deploy, run:
 
 ```sh
@@ -152,6 +188,12 @@ Expected response:
   "service": "OmniHex API",
   "time": "2026-05-02T00:00:00.000Z"
 }
+```
+
+Test the public signals endpoint:
+
+```sh
+curl https://api.lab.omnihex.xyz/public/signals
 ```
 
 ## Future Notes
