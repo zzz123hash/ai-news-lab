@@ -21,6 +21,7 @@ const posts = defineCollection({
 			'books',
 		]),
 		tags: z.array(z.string()).default([]),
+		access: z.enum(['free', 'pro']).default('free'),
 		seoTitle: z.string().trim().min(1).optional(),
 		seoDescription: z.string().trim().min(1).optional(),
 		targetQuery: z.string().trim().min(1).optional(),

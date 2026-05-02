@@ -1,0 +1,110 @@
+backend:
+  name: github
+  repo: zzz123hash/ai-news-lab
+  branch: main
+
+local_backend: true
+
+site_url: https://lab.omnihex.xyz
+display_url: https://lab.omnihex.xyz
+logo_url: /favicon.svg
+
+media_folder: public/uploads
+public_folder: /uploads
+
+publish_mode: editorial_workflow
+
+collections:
+  - name: posts
+    label: Posts
+    label_singular: Post
+    folder: src/content/posts
+    create: true
+    delete: false
+    extension: md
+    format: frontmatter
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    summary: "{{title}} | {{category}} | {{language}}"
+    sortable_fields:
+      - pubDate
+      - title
+      - category
+      - language
+      - draft
+    view_filters:
+      - label: Drafts
+        field: draft
+        pattern: true
+      - label: Pro
+        field: access
+        pattern: pro
+    fields:
+      - label: Title
+        name: title
+        widget: string
+        required: true
+      - label: Description
+        name: description
+        widget: text
+        required: true
+      - label: Publish Date
+        name: pubDate
+        widget: datetime
+        format: YYYY-MM-DD
+        date_format: YYYY-MM-DD
+        time_format: false
+        required: true
+      - label: Category
+        name: category
+        widget: select
+        required: true
+        options:
+          - ai
+          - news
+          - tutorials
+          - prompts
+          - tools
+          - briefs
+          - life
+          - guides
+          - products
+          - books
+      - label: Language
+        name: language
+        widget: select
+        default: en
+        required: true
+        options:
+          - en
+          - zh
+          - zh-CN
+          - id
+          - pt
+          - es
+          - vi
+      - label: Tags
+        name: tags
+        widget: list
+        default: []
+        required: false
+        field:
+          label: Tag
+          name: tag
+          widget: string
+      - label: Draft
+        name: draft
+        widget: boolean
+        default: true
+        required: false
+      - label: Access
+        name: access
+        widget: select
+        default: free
+        required: true
+        options:
+          - free
+          - pro
+      - label: Body
+        name: body
+        widget: markdown
+        required: true
