@@ -1,9 +1,14 @@
 <section class="dynamic-signals" aria-labelledby="dynamic-signals-heading" data-dynamic-signals>
-	<div class="signals-header">
+	<div class="signals-copy">
 		<p class="signals-eyebrow">AI Signals</p>
-		<h2 id="dynamic-signals-heading">Dynamic AI Signals</h2>
+		<div class="signals-heading-row">
+			<h2 id="dynamic-signals-heading">Dynamic AI Signals</h2>
+			<p class="signals-status" data-signals-status>Checking for fresh signals...</p>
+		</div>
+		<p class="signals-subtitle">
+			Fresh signals from the OmniHex API. The static site remains available even if the dynamic API is offline.
+		</p>
 	</div>
-	<p class="signals-status" data-signals-status>Checking for fresh signals...</p>
 	<ul class="signals-list" data-signals-list>
 		<li class="signals-fallback">Explore the latest AI briefs, prompts, and Life OS guides.</li>
 	</ul>
@@ -121,42 +126,62 @@
 
 <style>
 	.dynamic-signals {
-		border-top: 1px solid rgb(var(--gray-light));
-		border-bottom: 1px solid rgb(var(--gray-light));
-		margin: 1.5rem 0 0;
-		padding: 1.25rem 0;
+		position: relative;
+		margin: 2.5rem 0 0;
+		border: 1px solid rgba(var(--gray-light), 0.95);
+		border-radius: 8px;
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.98)),
+			rgb(var(--gray-light));
+		padding: 1.4rem;
+		box-shadow: 0 18px 48px rgba(15, 23, 42, 0.06);
 	}
 
-	.signals-header {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: baseline;
-		justify-content: space-between;
-		gap: 0.5rem 1rem;
+	.signals-copy {
+		display: grid;
+		gap: 0.55rem;
 	}
 
 	.signals-eyebrow {
 		margin: 0;
 		color: var(--accent-dark);
-		font-size: 0.9rem;
+		font-size: 0.78rem;
 		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.signals-heading-row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.65rem 1rem;
 	}
 
 	.dynamic-signals h2 {
 		margin: 0;
-		font-size: 1.35rem;
+		font-size: clamp(1.45rem, 3vw, 2rem);
+	}
+
+	.signals-subtitle {
+		max-width: 700px;
+		margin: 0;
+		color: rgb(var(--gray));
+		font-size: 0.98rem;
+		line-height: 1.6;
 	}
 
 	.signals-status {
-		width: fit-content;
-		margin: 0.85rem 0 0;
+		flex: 0 0 auto;
+		margin: 0;
 		border-radius: 999px;
-		background: rgb(var(--gray-light));
+		background: rgba(var(--gray-light), 0.72);
 		color: rgb(var(--gray));
-		font-size: 0.82rem;
+		font-size: 0.8rem;
 		font-weight: 700;
 		line-height: 1.2;
-		padding: 0.3rem 0.65rem;
+		padding: 0.35rem 0.7rem;
 	}
 
 	.dynamic-signals[data-state='loaded'] .signals-status {
@@ -166,41 +191,69 @@
 
 	.signals-list {
 		display: grid;
-		gap: 0.6rem;
-		margin: 1rem 0 0;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 0.85rem;
+		margin: 1.25rem 0 0;
 		padding: 0;
 		list-style: none;
 	}
 
 	.signals-list li {
-		border-left: 3px solid var(--accent);
-		padding-left: 0.75rem;
 		color: rgb(var(--gray-dark));
 	}
 
-	.signals-card {
+	.signals-card,
+	.signals-fallback {
 		display: grid;
-		gap: 0.25rem;
+		min-height: 100%;
+		border: 1px solid rgba(var(--gray-light), 0.95);
+		border-radius: 8px;
+		background: #fff;
+		padding: 1rem;
+		box-shadow: 0 10px 28px rgba(15, 23, 42, 0.045);
+	}
+
+	.signals-card {
+		gap: 0.7rem;
+		transition:
+			border-color 180ms ease,
+			box-shadow 180ms ease,
+			transform 180ms ease;
+	}
+
+	.signals-card:hover {
+		border-color: rgba(37, 99, 235, 0.3);
+		box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+		transform: translateY(-2px);
 	}
 
 	.signals-card strong {
 		color: rgb(var(--black));
+		font-size: 1rem;
 		line-height: 1.3;
 	}
 
 	.signals-card p {
 		margin: 0;
 		color: rgb(var(--gray));
-		font-size: 0.95rem;
+		font-size: 0.93rem;
 		line-height: 1.55;
 	}
 
 	.signals-meta {
+		align-self: end;
 		color: var(--accent-dark);
 		font-size: 0.78rem;
 		font-weight: 700;
-		letter-spacing: 0.02em;
+		letter-spacing: 0.04em;
 		text-transform: uppercase;
+	}
+
+	.signals-fallback {
+		grid-column: 1 / -1;
+		border-style: dashed;
+		color: rgb(var(--gray));
+		font-size: 0.98rem;
 	}
 
 	.dynamic-signals:not([data-state]) .signals-status::after {
@@ -226,6 +279,33 @@
 		.dynamic-signals:not([data-state]) .signals-status::after {
 			animation: none;
 			content: '';
+		}
+
+		.signals-card {
+			transition: none;
+		}
+
+		.signals-card:hover {
+			transform: none;
+		}
+	}
+
+	@media (max-width: 760px) {
+		.dynamic-signals {
+			margin-top: 2rem;
+			padding: 1rem;
+		}
+
+		.signals-heading-row {
+			align-items: flex-start;
+		}
+
+		.signals-status {
+			width: fit-content;
+		}
+
+		.signals-list {
+			grid-template-columns: 1fr;
 		}
 	}
 </style>
