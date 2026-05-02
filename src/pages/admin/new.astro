@@ -3,8 +3,8 @@ import PageLayout from '../../layouts/PageLayout.astro';
 
 const title = 'OmniHex Admin - New Draft';
 const description = 'Create a private multilingual content draft for OmniHex Lab.';
-const categories = ['briefs', 'prompts', 'life', 'ai', 'tutorials'];
-const languages = ['en', 'zh', 'id', 'pt', 'es', 'vi', 'tr'];
+const categories = ['ai', 'news', 'tutorials', 'prompts', 'tools', 'briefs', 'life', 'guides', 'products', 'books'];
+const languages = ['en', 'zh', 'id', 'pt', 'es', 'vi'];
 const aiFeatures = [
 	'Generate outline',
 	'Generate multilingual versions',
@@ -30,15 +30,13 @@ const aiFeatures = [
 		<div class="admin-grid">
 			<form class="draft-form" data-admin-form>
 				<div class="form-row">
-					<label for="contentIdea">content idea</label>
-					<input id="contentIdea" name="contentIdea" type="text" autocomplete="off" />
-					<p class="field-note">Workspace note only. It is not sent to the publishing API yet.</p>
+					<label for="title">title</label>
+					<input id="title" name="title" type="text" autocomplete="off" required />
 				</div>
 
 				<div class="form-row">
-					<label for="targetAudience">target audience</label>
-					<input id="targetAudience" name="targetAudience" type="text" autocomplete="off" />
-					<p class="field-note">Workspace note only. It is not sent to the publishing API yet.</p>
+					<label for="description">description</label>
+					<textarea id="description" name="description" rows="3" required></textarea>
 				</div>
 
 				<div class="field-grid">
@@ -50,35 +48,16 @@ const aiFeatures = [
 					</div>
 
 					<div class="form-row">
+						<label for="language">language</label>
+						<select id="language" name="language" required>
+							{languages.map((language) => <option value={language}>{language}</option>)}
+						</select>
+					</div>
+
+					<div class="form-row">
 						<label for="translationKey">translationKey</label>
 						<input id="translationKey" name="translationKey" type="text" autocomplete="off" />
 					</div>
-
-					<div class="form-row">
-						<label for="canonicalLanguage">canonicalLanguage</label>
-						<input id="canonicalLanguage" name="canonicalLanguage" type="text" value="en" autocomplete="off" />
-					</div>
-
-					<div class="form-row">
-						<label for="originalLanguage">originalLanguage</label>
-						<input id="originalLanguage" name="originalLanguage" type="text" autocomplete="off" />
-					</div>
-				</div>
-
-				<fieldset class="language-field">
-					<legend>target languages</legend>
-					<div class="language-options">
-						{languages.map((language, index) => (
-							<label>
-								<input name="targetLanguages" type="checkbox" value={language} checked={index === 0} />
-								<span>{language}</span>
-							</label>
-						))}
-					</div>
-					<p class="field-note">Current submission sends only the first selected language to /api/posts.</p>
-				</fieldset>
-
-				<div class="field-grid">
 					<div class="form-row">
 						<label for="source">source</label>
 						<input id="source" name="source" type="text" autocomplete="off" />
@@ -91,16 +70,6 @@ const aiFeatures = [
 				</div>
 
 				<div class="form-row">
-					<label for="title">title</label>
-					<input id="title" name="title" type="text" autocomplete="off" required />
-				</div>
-
-				<div class="form-row">
-					<label for="description">description</label>
-					<textarea id="description" name="description" rows="3" required></textarea>
-				</div>
-
-				<div class="form-row">
 					<label for="tags">tags</label>
 					<input id="tags" name="tags" type="text" placeholder="AI, News, Workflow" />
 				</div>
@@ -109,11 +78,6 @@ const aiFeatures = [
 					<label for="content">content markdown</label>
 					<textarea id="content" name="content" class="markdown-input" rows="14" required></textarea>
 				</div>
-
-				<label class="check-row" for="draft">
-					<input id="draft" name="draft" type="checkbox" checked />
-					<span>draft</span>
-				</label>
 
 				<div class="form-row">
 					<label for="CONTENT_API_TOKEN">CONTENT_API_TOKEN</label>
@@ -164,11 +128,10 @@ const aiFeatures = [
 
 		const formData = new FormData(form);
 		const token = getTextValue(formData, 'CONTENT_API_TOKEN');
-		const targetLanguages = formData.getAll('targetLanguages').map((language) => String(language));
-		const language = targetLanguages[0] ?? '';
+		const language = getTextValue(formData, 'language');
 
 		if (!language) {
-			statusText.textContent = 'Select at least one target language.';
+			statusText.textContent = 'Select a language.';
 			resultSummary.textContent = 'Failure: a language is required by /api/posts.';
 			resultOutput.textContent = '';
 			return;
@@ -183,11 +146,11 @@ const aiFeatures = [
 				.split(',')
 				.map((tag) => tag.trim())
 				.filter(Boolean),
-			draft: formData.get('draft') === 'on',
+			draft: true,
 			content: getTextValue(formData, 'content'),
 		};
 
-		for (const field of ['translationKey', 'canonicalLanguage', 'originalLanguage', 'source', 'sourceUrl']) {
+		for (const field of ['translationKey', 'source', 'sourceUrl']) {
 			const value = getTextValue(formData, field);
 
 			if (value) {
@@ -227,7 +190,6 @@ const aiFeatures = [
 				{
 					status: response.status,
 					sentLanguage: language,
-					selectedTargetLanguages: targetLanguages,
 					body: responseBody,
 				},
 				null,
@@ -325,8 +287,7 @@ const aiFeatures = [
 	}
 
 	label,
-	legend,
-	.check-row {
+	legend {
 		color: rgb(var(--black));
 		font-size: 0.92rem;
 		font-weight: 700;
@@ -367,47 +328,6 @@ const aiFeatures = [
 		margin: 0;
 		color: rgb(var(--gray));
 		font-size: 0.84rem;
-	}
-
-	.language-field {
-		display: grid;
-		gap: 0.5rem;
-		margin: 0;
-		border: 1px solid rgb(var(--gray-light));
-		border-radius: 8px;
-		padding: 0.85rem;
-	}
-
-	.language-field legend {
-		padding: 0 0.25rem;
-	}
-
-	.language-options {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-	}
-
-	.language-options label,
-	.check-row {
-		display: inline-flex;
-		gap: 0.5rem;
-		align-items: center;
-		width: fit-content;
-	}
-
-	.language-options label {
-		border: 1px solid rgb(var(--gray-light));
-		border-radius: 999px;
-		background: #fff;
-		padding: 0.4rem 0.65rem;
-	}
-
-	.language-options input,
-	.check-row input {
-		width: 1rem;
-		height: 1rem;
-		padding: 0;
 	}
 
 	.form-actions {
