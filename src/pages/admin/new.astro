@@ -53,6 +53,16 @@ const aiFeatures = [
 						<label for="translationKey">translationKey</label>
 						<input id="translationKey" name="translationKey" type="text" autocomplete="off" />
 					</div>
+
+					<div class="form-row">
+						<label for="canonicalLanguage">canonicalLanguage</label>
+						<input id="canonicalLanguage" name="canonicalLanguage" type="text" value="en" autocomplete="off" />
+					</div>
+
+					<div class="form-row">
+						<label for="originalLanguage">originalLanguage</label>
+						<input id="originalLanguage" name="originalLanguage" type="text" autocomplete="off" />
+					</div>
 				</div>
 
 				<fieldset class="language-field">
@@ -177,7 +187,7 @@ const aiFeatures = [
 			content: getTextValue(formData, 'content'),
 		};
 
-		for (const field of ['translationKey', 'source', 'sourceUrl']) {
+		for (const field of ['translationKey', 'canonicalLanguage', 'originalLanguage', 'source', 'sourceUrl']) {
 			const value = getTextValue(formData, field);
 
 			if (value) {

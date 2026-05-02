@@ -2,12 +2,11 @@
 import PostList from '../components/PostList.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import PageLayout from '../layouts/PageLayout.astro';
-import { getRepresentativePosts } from '../utils/posts';
+import { getRepresentativePostsByCategories } from '../utils/posts';
 
-const posts = await getRepresentativePosts();
-const latestBriefs = posts.filter((post) => post.data.category === 'briefs').slice(0, 4);
-const promptLibrary = posts.filter((post) => post.data.category === 'prompts').slice(0, 4);
-const lifeOsGuides = posts.filter((post) => ['life', 'guides'].includes(post.data.category)).slice(0, 4);
+const latestBriefs = (await getRepresentativePostsByCategories(['briefs'])).slice(0, 4);
+const promptLibrary = (await getRepresentativePostsByCategories(['prompts'])).slice(0, 4);
+const lifeOsGuides = (await getRepresentativePostsByCategories(['life', 'guides'])).slice(0, 4);
 ---
 
 <PageLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
