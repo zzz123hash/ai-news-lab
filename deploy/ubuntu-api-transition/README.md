@@ -89,6 +89,20 @@ The API runs at:
 127.0.0.1:3000
 ```
 
+## CORS
+
+The Fastify API enables CORS for the public dynamic endpoints so the static front-end at `https://lab.omnihex.xyz` can call `https://api.lab.omnihex.xyz`.
+
+Allowed origins:
+
+- `https://lab.omnihex.xyz`
+- `http://localhost:4321`
+- `http://localhost:3000`
+
+Allowed method:
+
+- `GET`
+
 Health check:
 
 ```sh

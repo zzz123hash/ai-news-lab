@@ -1,3 +1,4 @@
+import cors from '@fastify/cors';
 import Fastify from 'fastify';
 
 const app = Fastify({
@@ -5,6 +6,11 @@ const app = Fastify({
 });
 
 const serviceVersion = '0.1.0';
+const allowedOrigins = new Set([
+  'https://lab.omnihex.xyz',
+  'http://localhost:4321',
+  'http://localhost:3000',
+]);
 
 const mockSignals = [
   {
@@ -26,6 +32,18 @@ const mockSignals = [
     language: 'en',
   },
 ];
+
+await app.register(cors, {
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.has(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error('Origin not allowed by CORS'), false);
+  },
+  methods: ['GET'],
+});
 
 app.get('/health', async () => ({
   ok: true,
