@@ -4,7 +4,7 @@ export async function onRequestGet({ request, env }) {
 	try {
 		const url = new URL(request.url);
 		const includeTranslations = url.searchParams.get('includeTranslations') === 'true';
-		const posts = await getPostsData(request, env);
+		const posts = (await getPostsData(request, env)).filter((post) => post.draft !== true);
 		const visiblePosts = includeTranslations ? posts : getPostRepresentatives(posts);
 
 		return json({
@@ -81,4 +81,3 @@ function json(data, status = 200) {
 		},
 	});
 }
-
