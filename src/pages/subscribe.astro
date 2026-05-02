@@ -1,0 +1,61 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+---
+
+<PageLayout
+	title="Subscribe"
+	description="Follow OmniHex Lab briefs, prompt templates, and Life OS guides."
+>
+	<section class="page subscribe-page">
+		<p class="eyebrow">/subscribe/</p>
+		<h1>Subscribe to OmniHex Lab</h1>
+		<p>
+			Follow focused updates on multilingual AI briefs, reusable prompt patterns, and practical Life OS guides.
+		</p>
+		<p>
+			The first public subscription channel is RSS. Email subscriptions can be added after the publishing rhythm is stable.
+		</p>
+		<div class="actions">
+			<a class="button" href="/rss.xml">Open RSS feed</a>
+			<a href="/briefs/">Browse latest briefs</a>
+		</div>
+	</section>
+</PageLayout>
+
+<style>
+	.subscribe-page {
+		padding: 1rem 0 0.5rem;
+	}
+	.eyebrow {
+		margin: 0 0 0.5rem;
+		color: var(--accent-dark);
+		font-weight: 700;
+	}
+	.subscribe-page h1 {
+		font-size: clamp(2rem, 5vw, 3.2rem);
+	}
+	.subscribe-page p {
+		max-width: 720px;
+		color: rgb(var(--gray));
+	}
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.9rem;
+		margin-top: 1.4rem;
+	}
+	.actions a {
+		font-weight: 700;
+	}
+	.actions .button {
+		border-radius: 6px;
+		background: var(--accent);
+		padding: 0.55rem 0.9rem;
+		color: white;
+		text-decoration: none;
+	}
+	.actions .button:hover {
+		background: var(--accent-dark);
+	}
+</style>

@@ -1,6 +1,6 @@
 export const SITE_TITLE = 'OmniHex Lab';
 export const SITE_DESCRIPTION =
-	'面向 AI 新闻、教程、提示词、工具、小语种科技快报与 Life OS 行动指南的自动化内容站。';
+	'Multilingual AI briefs, practical prompts, and life operating guides.';
 export const SITE_URL = 'https://lab.omnihex.xyz';
 
 export const CATEGORIES = [
@@ -58,14 +58,12 @@ export const CATEGORIES = [
 ] as const;
 
 export const NAV_LINKS = [
-	{ href: '/ai/', label: 'AI' },
-	{ href: '/news/', label: 'News' },
-	{ href: '/prompts/', label: 'Prompts' },
 	{ href: '/briefs/', label: 'Briefs' },
+	{ href: '/prompts/', label: 'Prompts' },
 	{ href: '/life/', label: 'Life OS' },
-	{ href: '/guides/', label: 'Guides' },
-	{ href: '/products/', label: 'Products' },
-	{ href: '/books/', label: 'Books' },
+	{ href: '/subscribe/', label: 'Subscribe' },
+	{ href: '/api/', label: 'API' },
+	{ href: '/about/', label: 'About' },
 ] as const;
 
 export const LANGUAGE_NAMES: Record<string, string> = {

@@ -1,41 +1,56 @@
 ---
 import PostList from '../components/PostList.astro';
-import { CATEGORIES, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import PageLayout from '../layouts/PageLayout.astro';
 import { getRepresentativePosts } from '../utils/posts';
 
 const posts = await getRepresentativePosts();
-const briefs = posts.filter((post) => post.data.category === 'briefs').slice(0, 6);
-const latestArticles = posts.filter((post) => post.data.category !== 'briefs').slice(0, 8);
+const latestBriefs = posts.filter((post) => post.data.category === 'briefs').slice(0, 4);
+const promptLibrary = posts.filter((post) => post.data.category === 'prompts').slice(0, 4);
+const lifeOsGuides = posts.filter((post) => ['life', 'guides'].includes(post.data.category)).slice(0, 4);
 ---
 
 <PageLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
 	<section class="intro">
 		<p class="eyebrow">OmniHex Lab</p>
-		<h1>AI news, tutorials, prompts, tools, multilingual briefs, and Life OS guides in one automated lab.</h1>
+		<h1>Multilingual AI briefs, practical prompts, and life operating guides.</h1>
 		<p>
-			用 Astro + Markdown + Cloudflare Pages 搭建，面向 AI 新闻、教程、提示词、工具、小语种科技快报和可执行的人生行动指南，同时保留 RSS、自动发文 API 和 SEO 扩展空间。
+			Focused resources for reading faster, writing better prompts, and building practical personal systems with AI.
 		</p>
 	</section>
 
-	<nav class="category-nav" aria-label="Content categories">
-		{CATEGORIES.map((category) => <a href={`/${category.slug}/`}>{category.name}</a>)}
-	</nav>
-
-	<section>
-		<div class="section-heading">
-			<h2>Latest Articles</h2>
-			<a href="/rss.xml">RSS feed</a>
-		</div>
-		<PostList posts={latestArticles} />
-	</section>
-
-	<section class="brief-section">
+	<section class="content-section">
 		<div class="section-heading">
 			<h2>Latest Briefs</h2>
 			<a href="/briefs/">All briefs</a>
 		</div>
-		<PostList posts={briefs} emptyMessage="No briefs published yet." />
+		<PostList posts={latestBriefs} emptyMessage="No briefs published yet." />
+	</section>
+
+	<section class="content-section">
+		<div class="section-heading">
+			<h2>Prompt Library</h2>
+			<a href="/prompts/">All prompts</a>
+		</div>
+		<PostList posts={promptLibrary} emptyMessage="No prompts published yet." />
+	</section>
+
+	<section class="content-section">
+		<div class="section-heading">
+			<h2>Life OS Guides</h2>
+			<a href="/life/">All Life OS</a>
+		</div>
+		<PostList posts={lifeOsGuides} emptyMessage="No Life OS guides published yet." />
+	</section>
+
+	<section class="subscribe-cta" aria-labelledby="subscribe-heading">
+		<p class="eyebrow">Subscribe</p>
+		<h2 id="subscribe-heading">Get the next OmniHex Lab update</h2>
+		<p>Follow new briefs, prompt patterns, and Life OS guides as the library grows.</p>
+		<div class="cta-actions">
+			<a class="button" href="/subscribe/">Subscribe</a>
+			<a href="/rss.xml">RSS feed</a>
+		</div>
 	</section>
 </PageLayout>
 
@@ -58,22 +73,8 @@ const latestArticles = posts.filter((post) => post.data.category !== 'briefs').s
 		color: rgb(var(--gray));
 		font-size: 1.1rem;
 	}
-	.category-nav {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.75rem;
-		margin: 1rem 0 3rem;
-		padding-bottom: 1.5rem;
-		border-bottom: 1px solid rgb(var(--gray-light));
-	}
-	.category-nav a {
-		border: 1px solid rgb(var(--gray-light));
-		border-radius: 999px;
-		padding: 0.35rem 0.8rem;
-		text-decoration: none;
-	}
-	.category-nav a:hover {
-		border-color: var(--accent);
+	.content-section {
+		margin-top: 3rem;
 	}
 	.section-heading {
 		display: flex;
@@ -85,7 +86,36 @@ const latestArticles = posts.filter((post) => post.data.category !== 'briefs').s
 		margin: 0;
 		font-size: 1.6rem;
 	}
-	.brief-section {
+	.subscribe-cta {
+		border-top: 1px solid rgb(var(--gray-light));
 		margin-top: 3rem;
+		padding-top: 2rem;
+	}
+	.subscribe-cta h2 {
+		margin-bottom: 0.6rem;
+		font-size: 1.8rem;
+	}
+	.subscribe-cta p:not(.eyebrow) {
+		max-width: 640px;
+		color: rgb(var(--gray));
+	}
+	.cta-actions {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.9rem;
+	}
+	.cta-actions a {
+		font-weight: 700;
+	}
+	.cta-actions .button {
+		border-radius: 6px;
+		background: var(--accent);
+		padding: 0.55rem 0.9rem;
+		color: white;
+		text-decoration: none;
+	}
+	.cta-actions .button:hover {
+		background: var(--accent-dark);
 	}
 </style>

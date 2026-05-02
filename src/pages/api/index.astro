@@ -1,0 +1,69 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+---
+
+<PageLayout
+	title="API"
+	description="Public and publishing API notes for OmniHex Lab."
+>
+	<section class="page api-page">
+		<p class="eyebrow">/api/</p>
+		<h1>OmniHex Lab API</h1>
+		<p>
+			OmniHex Lab keeps a small API surface for public content feeds and controlled publishing workflows.
+		</p>
+		<ul class="endpoint-list">
+			<li>
+				<a href="/api/public/posts">Public posts feed</a>
+				<span>Representative published posts for lightweight integrations.</span>
+			</li>
+			<li>
+				<code>POST /api/posts</code>
+				<span>Token-protected publishing endpoint for draft automation.</span>
+			</li>
+			<li>
+				<code>GET /api/health</code>
+				<span>Health check for deployment and automation monitors.</span>
+			</li>
+		</ul>
+	</section>
+</PageLayout>
+
+<style>
+	.api-page {
+		padding: 1rem 0 0.5rem;
+	}
+	.eyebrow {
+		margin: 0 0 0.5rem;
+		color: var(--accent-dark);
+		font-weight: 700;
+	}
+	.api-page h1 {
+		font-size: clamp(2rem, 5vw, 3.2rem);
+	}
+	.api-page p {
+		max-width: 720px;
+		color: rgb(var(--gray));
+	}
+	.endpoint-list {
+		display: grid;
+		gap: 1rem;
+		margin: 2rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+	.endpoint-list li {
+		border-top: 1px solid rgb(var(--gray-light));
+		padding-top: 1rem;
+	}
+	.endpoint-list a,
+	.endpoint-list code {
+		display: block;
+		margin-bottom: 0.25rem;
+		color: var(--accent-dark);
+		font-weight: 700;
+	}
+	.endpoint-list span {
+		color: rgb(var(--gray));
+	}
+</style>
