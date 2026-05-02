@@ -112,6 +112,13 @@ npm run build
 
 The production output is generated in `dist/`.
 
+## Admin Prototype
+
+- `/admin/new` is an early private publishing form.
+- It posts to `/api/posts`.
+- It does not store tokens.
+- Real authentication and AI generation will be added later.
+
 ## Cloudflare Pages Deployment
 
 Use these Cloudflare Pages settings:

@@ -1,0 +1,408 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+
+const title = 'OmniHex Admin — New Content Draft';
+const description =
+	'This is a private publishing workspace for creating multilingual content drafts for OmniHex Lab.';
+const categories = ['briefs', 'prompts', 'life', 'ai', 'tutorials'];
+const languages = ['en', 'zh', 'id', 'pt', 'es', 'vi', 'tr'];
+const aiFeatures = [
+	'Generate outline',
+	'Generate multilingual versions',
+	'Improve SEO title',
+	'Create summary',
+	'Create distribution snippets',
+];
+---
+
+<PageLayout title={title} description={description}>
+	<section class="admin-shell">
+		<div class="admin-header">
+			<p class="eyebrow">Private workspace</p>
+			<h1>{title}</h1>
+			<p>{description}</p>
+		</div>
+
+		<div class="admin-grid">
+			<form class="draft-form" data-admin-form>
+				<div class="form-row">
+					<label for="title">title</label>
+					<input id="title" name="title" type="text" autocomplete="off" required />
+				</div>
+
+				<div class="form-row">
+					<label for="description">description</label>
+					<textarea id="description" name="description" rows="3" required></textarea>
+				</div>
+
+				<div class="field-grid">
+					<div class="form-row">
+						<label for="category">category</label>
+						<select id="category" name="category" required>
+							{categories.map((category) => <option value={category}>{category}</option>)}
+						</select>
+					</div>
+
+					<div class="form-row">
+						<label for="language">language</label>
+						<select id="language" name="language" required>
+							{languages.map((language) => <option value={language}>{language}</option>)}
+						</select>
+					</div>
+				</div>
+
+				<div class="field-grid">
+					<div class="form-row">
+						<label for="translationKey">translationKey</label>
+						<input id="translationKey" name="translationKey" type="text" autocomplete="off" />
+					</div>
+
+					<div class="form-row">
+						<label for="tags">tags</label>
+						<input id="tags" name="tags" type="text" placeholder="AI, News, Workflow" />
+					</div>
+				</div>
+
+				<div class="field-grid">
+					<div class="form-row">
+						<label for="source">source</label>
+						<input id="source" name="source" type="text" autocomplete="off" />
+					</div>
+
+					<div class="form-row">
+						<label for="sourceUrl">sourceUrl</label>
+						<input id="sourceUrl" name="sourceUrl" type="url" inputmode="url" />
+					</div>
+				</div>
+
+				<label class="check-row" for="draft">
+					<input id="draft" name="draft" type="checkbox" checked />
+					<span>draft</span>
+				</label>
+
+				<div class="form-row">
+					<label for="content">content</label>
+					<textarea id="content" name="content" class="markdown-input" rows="14" required></textarea>
+				</div>
+
+				<div class="form-row">
+					<label for="CONTENT_API_TOKEN">CONTENT_API_TOKEN</label>
+					<input
+						id="CONTENT_API_TOKEN"
+						name="CONTENT_API_TOKEN"
+						type="password"
+						autocomplete="off"
+						required
+					/>
+					<p class="field-note">Used only for this request. The token is not saved.</p>
+				</div>
+
+				<div class="form-actions">
+					<button type="submit">Submit draft</button>
+					<p data-submit-status aria-live="polite"></p>
+				</div>
+			</form>
+
+			<aside class="side-panel">
+				<section class="ai-panel" aria-labelledby="ai-features-heading">
+					<h2 id="ai-features-heading">AI features coming soon</h2>
+					<div class="ai-actions">
+						{aiFeatures.map((feature) => <button type="button" disabled>{feature}</button>)}
+					</div>
+				</section>
+
+				<section class="result-panel" aria-labelledby="result-heading">
+					<h2 id="result-heading">Submission result</h2>
+					<p data-result-summary>Submit a draft to see the API response.</p>
+					<pre data-result-output></pre>
+				</section>
+			</aside>
+		</div>
+	</section>
+</PageLayout>
+
+<script>
+	const form = document.querySelector('[data-admin-form]');
+	const statusText = document.querySelector('[data-submit-status]');
+	const resultSummary = document.querySelector('[data-result-summary]');
+	const resultOutput = document.querySelector('[data-result-output]');
+
+	const getTextValue = (formData, name) => String(formData.get(name) ?? '').trim();
+
+	form?.addEventListener('submit', async (event) => {
+		event.preventDefault();
+
+		const formData = new FormData(form);
+		const token = getTextValue(formData, 'CONTENT_API_TOKEN');
+		const payload = {
+			title: getTextValue(formData, 'title'),
+			description: getTextValue(formData, 'description'),
+			category: getTextValue(formData, 'category'),
+			language: getTextValue(formData, 'language'),
+			tags: getTextValue(formData, 'tags')
+				.split(',')
+				.map((tag) => tag.trim())
+				.filter(Boolean),
+			draft: formData.get('draft') === 'on',
+			content: getTextValue(formData, 'content'),
+		};
+
+		for (const field of ['translationKey', 'source', 'sourceUrl']) {
+			const value = getTextValue(formData, field);
+
+			if (value) {
+				payload[field] = value;
+			}
+		}
+
+		statusText.textContent = 'Submitting...';
+		resultSummary.textContent = 'Waiting for /api/posts...';
+		resultOutput.textContent = '';
+
+		try {
+			const response = await fetch('/api/posts', {
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${token}`,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(payload),
+			});
+			const responseText = await response.text();
+			let responseBody = responseText;
+
+			try {
+				responseBody = responseText ? JSON.parse(responseText) : null;
+			} catch {
+				responseBody = responseText || null;
+			}
+
+			const succeeded = response.ok && responseBody?.ok !== false;
+
+			statusText.textContent = succeeded ? 'Draft submitted.' : 'Submission failed.';
+			resultSummary.textContent = succeeded
+				? 'Success: /api/posts accepted the draft.'
+				: `Failure: /api/posts returned HTTP ${response.status}.`;
+			resultOutput.textContent = JSON.stringify(
+				{
+					status: response.status,
+					body: responseBody,
+				},
+				null,
+				2,
+			);
+		} catch (error) {
+			statusText.textContent = 'Submission failed.';
+			resultSummary.textContent = 'Failure: the request could not be completed.';
+			resultOutput.textContent = JSON.stringify(
+				{
+					error: error instanceof Error ? error.message : 'Unexpected error',
+				},
+				null,
+				2,
+			);
+		} finally {
+			const tokenInput = form.querySelector('[name="CONTENT_API_TOKEN"]');
+
+			if (tokenInput instanceof HTMLInputElement) {
+				tokenInput.value = '';
+			}
+		}
+	});
+</script>
+
+<style>
+	.admin-shell {
+		max-width: 1120px;
+		margin: 0 auto;
+	}
+
+	.admin-header {
+		margin-bottom: 2rem;
+	}
+
+	.eyebrow {
+		margin: 0 0 0.5rem;
+		color: var(--accent-dark);
+		font-weight: 700;
+	}
+
+	.admin-header h1 {
+		max-width: 900px;
+		font-size: clamp(2.1rem, 4vw, 3.6rem);
+	}
+
+	.admin-header p:last-child {
+		max-width: 780px;
+		color: rgb(var(--gray));
+		font-size: 1.08rem;
+	}
+
+	.admin-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 320px;
+		gap: 1.25rem;
+		align-items: start;
+	}
+
+	.draft-form,
+	.ai-panel,
+	.result-panel {
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.92);
+		box-shadow: 0 10px 30px rgba(var(--black), 6%);
+	}
+
+	.draft-form {
+		display: grid;
+		gap: 1rem;
+		padding: 1.25rem;
+	}
+
+	.field-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 1rem;
+	}
+
+	.form-row {
+		display: grid;
+		gap: 0.35rem;
+	}
+
+	label,
+	.check-row {
+		color: rgb(var(--black));
+		font-size: 0.92rem;
+		font-weight: 700;
+		line-height: 1.3;
+	}
+
+	input,
+	select,
+	textarea {
+		width: 100%;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 6px;
+		background: #fff;
+		color: rgb(var(--gray-dark));
+		font: inherit;
+		line-height: 1.45;
+		padding: 0.7rem 0.75rem;
+	}
+
+	input:focus,
+	select:focus,
+	textarea:focus {
+		border-color: var(--accent);
+		outline: 3px solid rgba(37, 99, 235, 0.14);
+	}
+
+	textarea {
+		resize: vertical;
+	}
+
+	.markdown-input {
+		min-height: 340px;
+		font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+		font-size: 0.92rem;
+	}
+
+	.field-note {
+		margin: 0;
+		color: rgb(var(--gray));
+		font-size: 0.84rem;
+	}
+
+	.check-row {
+		display: inline-flex;
+		gap: 0.6rem;
+		align-items: center;
+		width: fit-content;
+	}
+
+	.check-row input {
+		width: 1rem;
+		height: 1rem;
+	}
+
+	.form-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.85rem;
+		align-items: center;
+	}
+
+	button {
+		border: 0;
+		border-radius: 6px;
+		background: var(--accent);
+		color: #fff;
+		cursor: pointer;
+		font: inherit;
+		font-weight: 700;
+		line-height: 1.2;
+		padding: 0.75rem 1rem;
+	}
+
+	button:disabled {
+		border: 1px solid rgb(var(--gray-light));
+		background: rgb(var(--gray-light));
+		color: rgb(var(--gray));
+		cursor: not-allowed;
+	}
+
+	[data-submit-status] {
+		margin: 0;
+		color: rgb(var(--gray));
+		font-size: 0.92rem;
+	}
+
+	.side-panel {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.ai-panel,
+	.result-panel {
+		padding: 1rem;
+	}
+
+	.ai-panel h2,
+	.result-panel h2 {
+		font-size: 1.25rem;
+	}
+
+	.ai-actions {
+		display: grid;
+		gap: 0.65rem;
+	}
+
+	.ai-actions button {
+		width: 100%;
+		text-align: left;
+	}
+
+	.result-panel p {
+		color: rgb(var(--gray));
+		font-size: 0.95rem;
+	}
+
+	.result-panel pre {
+		max-height: 360px;
+		margin: 0;
+		border: 1px solid rgb(var(--gray-light));
+		background: #f8fafc;
+		color: rgb(var(--gray-dark));
+		font-size: 0.82rem;
+		white-space: pre-wrap;
+	}
+
+	@media (max-width: 900px) {
+		.admin-grid,
+		.field-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
