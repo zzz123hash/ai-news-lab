@@ -133,6 +133,155 @@ The production output is generated in `dist/`.
 - AI generation, source collection, user personalization, and paid features will be added later.
 - Current publishing boundary is `POST /api/posts`.
 
+## Server-Side Admin MVP
+
+The protected admin MVP is a separate Node.js service in `server/`. It does not change the Astro static site or the Cloudflare Pages deployment. Run it behind `admin.lab.omnihex.xyz` while keeping `lab.omnihex.xyz` on Cloudflare Pages.
+
+Current scope:
+
+- Token login with `ADMIN_TOKEN`
+- Article editor for title, summary, category, language, Markdown body, tags, and draft status
+- AI draft generation through a provider layer
+- Publishing through either the existing `/api/posts` endpoint or the GitHub Contents API
+- No payment flow, user database, or heavy CMS
+
+Local server:
+
+```sh
+ADMIN_TOKEN=change-me npm run admin:start
+```
+
+Default admin URL:
+
+```text
+http://localhost:8787/admin
+```
+
+### Admin Environment Variables
+
+Required:
+
+```text
+ADMIN_TOKEN=<private admin login token>
+```
+
+Recommended:
+
+```text
+SESSION_SECRET=<long random cookie signing secret>
+COOKIE_SECURE=auto
+```
+
+Publishing through the existing Cloudflare Pages Function:
+
+```text
+PUBLISH_TARGET=content-api
+CONTENT_API_URL=https://lab.omnihex.xyz/api/posts
+CONTENT_API_TOKEN=<same token configured in Cloudflare Pages>
+```
+
+Publishing directly through GitHub:
+
+```text
+PUBLISH_TARGET=github
+GITHUB_TOKEN=<GitHub fine-grained token with contents write access>
+GITHUB_OWNER=zzz123hash
+GITHUB_REPO=ai-news-lab
+GITHUB_BRANCH=main
+```
+
+AI draft provider:
+
+```text
+AI_PROVIDER=mock
+```
+
+`mock` is the default provider and returns a structured placeholder draft without calling an external model. The provider layer is ready for OpenAI-compatible providers:
+
+```text
+AI_PROVIDER=openai
+OPENAI_API_KEY=<key>
+AI_MODEL=<current model name>
+```
+
+or:
+
+```text
+AI_PROVIDER=openrouter
+OPENROUTER_API_KEY=<key>
+AI_MODEL=<model name>
+AI_HTTP_REFERER=https://admin.lab.omnihex.xyz
+AI_APP_TITLE=OmniHex Lab Admin
+```
+
+For another compatible endpoint:
+
+```text
+AI_PROVIDER=openai-compatible
+AI_API_BASE_URL=https://example.com/v1
+AI_API_KEY=<key>
+AI_MODEL=<model name>
+```
+
+### Docker Compose Deployment
+
+Create a server-side `.env` file next to `docker-compose.yml`:
+
+```text
+ADMIN_TOKEN=replace-with-a-long-random-token
+SESSION_SECRET=replace-with-another-long-random-secret
+PUBLISH_TARGET=content-api
+CONTENT_API_URL=https://lab.omnihex.xyz/api/posts
+CONTENT_API_TOKEN=replace-with-content-api-token
+AI_PROVIDER=mock
+```
+
+Start the admin service:
+
+```sh
+docker compose up -d --build
+```
+
+Check health:
+
+```sh
+curl http://127.0.0.1:8787/api/health
+```
+
+View logs:
+
+```sh
+docker compose logs -f admin
+```
+
+Upgrade after pulling new code:
+
+```sh
+docker compose up -d --build
+```
+
+### Nginx Reverse Proxy
+
+Point `admin.lab.omnihex.xyz` at the server and proxy it to the local Compose port:
+
+```nginx
+server {
+    listen 80;
+    server_name admin.lab.omnihex.xyz;
+
+    location / {
+        proxy_pass http://127.0.0.1:8787;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+Use HTTPS in production, for example with Certbot. Keep the public Astro site deployed through Cloudflare Pages at `lab.omnihex.xyz`.
+
 ## Cloudflare Pages Deployment
 
 Use these Cloudflare Pages settings:

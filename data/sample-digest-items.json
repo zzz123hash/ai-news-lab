@@ -1,0 +1,52 @@
+[
+  {
+    "title": "Open model release focuses on smaller on-device assistants",
+    "url": "https://example.com/open-model-on-device-assistants",
+    "author": "Example AI Desk",
+    "source_language": "en",
+    "target_languages": ["en", "zh", "id"],
+    "raw_text": "A research group released a compact open model aimed at on-device assistant workflows. The announcement emphasized lower latency, privacy-sensitive local processing, and developer tooling for retrieval-augmented apps. Independent benchmarks are still limited, so editors should verify performance claims before publication.",
+    "topic": "open models",
+    "importance_score": 87
+  },
+  {
+    "title": "Enterprise teams test AI agents for weekly reporting",
+    "url": "https://example.com/enterprise-ai-agents-weekly-reporting",
+    "author": "Workflow Monitor",
+    "source_language": "en",
+    "target_languages": ["en", "es", "pt"],
+    "raw_text": "Several enterprise teams are piloting AI agents that collect metrics, summarize project updates, and draft weekly reporting emails. The main adoption constraint is not generation quality alone, but permissions, audit trails, and human approval before messages are sent.",
+    "topic": "AI agents",
+    "importance_score": 82
+  },
+  {
+    "title": "New browser automation tools target non-technical operators",
+    "url": "https://example.com/browser-automation-operators",
+    "author": "Automation Notes",
+    "source_language": "en",
+    "target_languages": ["en", "zh", "vi"],
+    "raw_text": "A new wave of browser automation products is being marketed to operations teams that do not write code. The tools promise repeatable data entry, lead research, and internal dashboard checks. Reliability remains the key issue because web pages change often.",
+    "topic": "automation",
+    "importance_score": 76
+  },
+  {
+    "title": "Publishers experiment with AI-assisted multilingual briefs",
+    "url": "https://example.com/multilingual-ai-briefs",
+    "author": "Media Lab Sample",
+    "source_language": "en",
+    "target_languages": ["en", "id", "pt", "es"],
+    "raw_text": "Small publishers are using AI-assisted workflows to turn source notes into multilingual briefs. Editors report that translation is easier than localization: headlines, examples, and cultural assumptions still need human review.",
+    "topic": "multilingual publishing",
+    "importance_score": 91
+  },
+  {
+    "title": "AI search tools add source comparison panels",
+    "url": "https://example.com/ai-search-source-comparison",
+    "author": "Search Product Wire",
+    "source_language": "en",
+    "target_languages": ["en", "zh", "es"],
+    "raw_text": "AI search products are adding source comparison panels that show multiple references beside generated answers. The feature may help readers inspect claims faster, but it does not remove the need to evaluate original sources and publication dates.",
+    "topic": "AI search",
+    "importance_score": 84
+  }
+]

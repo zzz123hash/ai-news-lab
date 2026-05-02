@@ -9,7 +9,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "admin:dev": "node --watch server/index.js",
+    "admin:start": "node server/index.js"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.18",

@@ -1,0 +1,31 @@
+services:
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile.admin
+    container_name: ai-news-lab-admin
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 8787
+      ADMIN_TOKEN: ${ADMIN_TOKEN:?set ADMIN_TOKEN}
+      SESSION_SECRET: ${SESSION_SECRET:-}
+      COOKIE_SECURE: ${COOKIE_SECURE:-auto}
+      PUBLISH_TARGET: ${PUBLISH_TARGET:-content-api}
+      CONTENT_API_URL: ${CONTENT_API_URL:-https://lab.omnihex.xyz/api/posts}
+      CONTENT_API_TOKEN: ${CONTENT_API_TOKEN:-}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      GITHUB_OWNER: ${GITHUB_OWNER:-}
+      GITHUB_REPO: ${GITHUB_REPO:-ai-news-lab}
+      GITHUB_BRANCH: ${GITHUB_BRANCH:-main}
+      AI_PROVIDER: ${AI_PROVIDER:-mock}
+      AI_API_BASE_URL: ${AI_API_BASE_URL:-}
+      AI_API_KEY: ${AI_API_KEY:-}
+      AI_MODEL: ${AI_MODEL:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      AI_HTTP_REFERER: ${AI_HTTP_REFERER:-https://admin.lab.omnihex.xyz}
+      AI_APP_TITLE: ${AI_APP_TITLE:-OmniHex Lab Admin}
+    ports:
+      - "127.0.0.1:8787:8787"
