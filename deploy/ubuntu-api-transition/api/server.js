@@ -4,6 +4,8 @@ const app = Fastify({
   logger: true,
 });
 
+const serviceVersion = '0.1.0';
+
 const mockSignals = [
   {
     title: 'AI workflows are becoming personal operating systems',
@@ -34,6 +36,21 @@ app.get('/health', async () => ({
 app.get('/public/signals', async () => ({
   ok: true,
   signals: mockSignals,
+}));
+
+app.get('/public/status', async () => ({
+  ok: true,
+  service: 'OmniHex API',
+  version: serviceVersion,
+  environment: 'transition',
+  features: {
+    health: true,
+    signals: true,
+    ai: false,
+    database: false,
+    notion: false,
+  },
+  time: new Date().toISOString(),
 }));
 
 const host = process.env.HOST || '127.0.0.1';

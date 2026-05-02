@@ -141,6 +141,33 @@ Current mock response:
 }
 ```
 
+Public API status:
+
+```sh
+curl http://127.0.0.1:3000/public/status
+```
+
+`/public/status` reports the transition API version, runtime environment, and which prototype features are enabled. It is public and does not require authentication.
+
+Expected response:
+
+```json
+{
+  "ok": true,
+  "service": "OmniHex API",
+  "version": "0.1.0",
+  "environment": "transition",
+  "features": {
+    "health": true,
+    "signals": true,
+    "ai": false,
+    "database": false,
+    "notion": false
+  },
+  "time": "2026-05-02T00:00:00.000Z"
+}
+```
+
 After deploy, run:
 
 ```sh
@@ -194,6 +221,12 @@ Test the public signals endpoint:
 
 ```sh
 curl https://api.lab.omnihex.xyz/public/signals
+```
+
+Test the public status endpoint:
+
+```sh
+curl https://api.lab.omnihex.xyz/public/status
 ```
 
 ## Future Notes
