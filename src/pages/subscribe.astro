@@ -111,17 +111,36 @@ const languages = [
 			<dl class="result-list">
 				<div>
 					<dt>API Key</dt>
-					<dd><code data-api-key></code></dd>
+					<dd>
+						<span class="value-row">
+							<code data-api-key></code>
+							<button class="secondary-button" type="button" data-copy-api-key>Copy API Key</button>
+						</span>
+					</dd>
+				</div>
+				<div>
+					<dt>keyPrefix</dt>
+					<dd data-key-prefix></dd>
 				</div>
 				<div>
 					<dt>dailyLimit</dt>
 					<dd data-daily-limit></dd>
 				</div>
 				<div>
+					<dt>status</dt>
+					<dd data-api-key-status></dd>
+				</div>
+				<div>
 					<dt>unsubscribeUrl</dt>
-					<dd><a data-unsubscribe-url target="_blank" rel="noopener noreferrer"></a></dd>
+					<dd>
+						<span class="value-row">
+							<a data-unsubscribe-url target="_blank" rel="noopener noreferrer"></a>
+							<button class="secondary-button" type="button" data-copy-unsubscribe-url>Copy unsubscribe URL</button>
+						</span>
+					</dd>
 				</div>
 			</dl>
+			<p class="copy-status" data-copy-status aria-live="polite"></p>
 		</section>
 	</section>
 </PageLayout>
@@ -133,8 +152,13 @@ const languages = [
 	const statusMessage = document.querySelector('[data-status-message]');
 	const resultPanel = document.querySelector('[data-result-panel]');
 	const apiKeyOutput = document.querySelector('[data-api-key]');
+	const keyPrefixOutput = document.querySelector('[data-key-prefix]');
 	const dailyLimitOutput = document.querySelector('[data-daily-limit]');
+	const apiKeyStatusOutput = document.querySelector('[data-api-key-status]');
 	const unsubscribeUrlOutput = document.querySelector('[data-unsubscribe-url]');
+	const copyApiKeyButton = document.querySelector('[data-copy-api-key]');
+	const copyUnsubscribeUrlButton = document.querySelector('[data-copy-unsubscribe-url]');
+	const copyStatus = document.querySelector('[data-copy-status]');
 
 	function getCheckedValues(name) {
 		return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map((input) => input.value);
@@ -148,9 +172,15 @@ const languages = [
 	function clearResult() {
 		resultPanel.hidden = true;
 		apiKeyOutput.textContent = '';
+		keyPrefixOutput.textContent = '';
 		dailyLimitOutput.textContent = '';
+		apiKeyStatusOutput.textContent = '';
 		unsubscribeUrlOutput.textContent = '';
 		unsubscribeUrlOutput.removeAttribute('href');
+		copyApiKeyButton.disabled = true;
+		copyUnsubscribeUrlButton.disabled = true;
+		copyStatus.textContent = '';
+		delete copyStatus.dataset.state;
 	}
 
 	async function readPayload(response) {
@@ -164,9 +194,72 @@ const languages = [
 		return text ? { message: text } : {};
 	}
 
-	function getPayloadValue(payload, camelName, snakeName) {
-		return payload?.[camelName] ?? payload?.[snakeName] ?? payload?.data?.[camelName] ?? payload?.data?.[snakeName];
+	function getApiKeyData(payload) {
+		return payload?.apiKey ?? payload?.api_key ?? payload?.data?.apiKey ?? payload?.data?.api_key ?? null;
 	}
+
+	function getSubscriptionData(payload) {
+		return payload?.subscription ?? payload?.data?.subscription ?? null;
+	}
+
+	function getScalarValue(value) {
+		if (value === undefined || value === null || value === '') {
+			return null;
+		}
+
+		if (typeof value === 'object') {
+			return null;
+		}
+
+		return String(value);
+	}
+
+	function getApiKeyValue(apiKeyData, payload) {
+		return getScalarValue(apiKeyData?.value) ?? getScalarValue(apiKeyData) ?? getScalarValue(payload?.key);
+	}
+
+	function getApiKeyField(apiKeyData, camelName, snakeName) {
+		return getScalarValue(apiKeyData?.[camelName] ?? apiKeyData?.[snakeName]);
+	}
+
+	function getUnsubscribeUrl(subscriptionData, payload) {
+		return (
+			getScalarValue(subscriptionData?.unsubscribeUrl ?? subscriptionData?.unsubscribe_url) ??
+			getScalarValue(payload?.unsubscribeUrl ?? payload?.unsubscribe_url) ??
+			getScalarValue(payload?.data?.unsubscribeUrl ?? payload?.data?.unsubscribe_url)
+		);
+	}
+
+	function setCopyStatus(message, type) {
+		copyStatus.textContent = message;
+		copyStatus.dataset.state = type;
+	}
+
+	async function copyText(text, successMessage) {
+		if (!text) {
+			setCopyStatus('Nothing is available to copy yet.', 'error');
+			return;
+		}
+
+		try {
+			if (!navigator.clipboard?.writeText) {
+				throw new Error('Clipboard API is unavailable.');
+			}
+
+			await navigator.clipboard.writeText(text);
+			setCopyStatus(successMessage, 'success');
+		} catch {
+			setCopyStatus('Copy failed. Select the value and copy it manually.', 'error');
+		}
+	}
+
+	copyApiKeyButton?.addEventListener('click', () => {
+		copyText(apiKeyOutput.textContent.trim(), 'API key copied.');
+	});
+
+	copyUnsubscribeUrlButton?.addEventListener('click', () => {
+		copyText(unsubscribeUrlOutput.textContent.trim(), 'Unsubscribe URL copied.');
+	});
 
 	form?.addEventListener('submit', async (event) => {
 		event.preventDefault();
@@ -215,24 +308,28 @@ const languages = [
 				throw new Error(payload?.error || payload?.message || 'The subscription service could not complete the request.');
 			}
 
-			const apiKey = getPayloadValue(payload, 'apiKey', 'api_key') ?? getPayloadValue(payload, 'key', 'key');
-			const dailyLimit = getPayloadValue(payload, 'dailyLimit', 'daily_limit');
-			const unsubscribeUrl = getPayloadValue(payload, 'unsubscribeUrl', 'unsubscribe_url');
+			const apiKeyData = getApiKeyData(payload);
+			const subscriptionData = getSubscriptionData(payload);
+			const apiKey = getApiKeyValue(apiKeyData, payload);
+			const keyPrefix = getApiKeyField(apiKeyData, 'keyPrefix', 'key_prefix');
+			const dailyLimit = getApiKeyField(apiKeyData, 'dailyLimit', 'daily_limit');
+			const apiKeyStatus = getApiKeyField(apiKeyData, 'status', 'status');
+			const unsubscribeUrl = getUnsubscribeUrl(subscriptionData, payload);
 
-			if (!apiKey) {
-				throw new Error('The subscription was created, but the API key was not returned. Please contact OmniHex Lab support.');
-			}
-
-			apiKeyOutput.textContent = apiKey;
-			dailyLimitOutput.textContent = dailyLimit ?? 'Not provided';
+			apiKeyOutput.textContent = apiKey ?? 'API key was not returned. Contact support.';
+			keyPrefixOutput.textContent = keyPrefix ?? 'Key prefix was not returned.';
+			dailyLimitOutput.textContent = dailyLimit ?? 'Daily limit was not returned.';
+			apiKeyStatusOutput.textContent = apiKeyStatus ?? 'Status was not returned.';
+			copyApiKeyButton.disabled = !apiKey;
 
 			if (unsubscribeUrl) {
 				unsubscribeUrlOutput.textContent = unsubscribeUrl;
 				unsubscribeUrlOutput.href = unsubscribeUrl;
 			} else {
-				unsubscribeUrlOutput.textContent = 'Not provided';
+				unsubscribeUrlOutput.textContent = 'Unsubscribe URL was not returned.';
 			}
 
+			copyUnsubscribeUrlButton.disabled = !unsubscribeUrl;
 			resultPanel.hidden = false;
 			setStatus('Subscription created.', 'success');
 		} catch (error) {
@@ -405,6 +502,17 @@ const languages = [
 		color: #9f2d2d;
 		font-weight: 700;
 	}
+	.copy-status {
+		margin: 0.9rem 0 0;
+		color: rgb(var(--gray));
+		font-weight: 700;
+	}
+	.copy-status[data-state='success'] {
+		color: #197245;
+	}
+	.copy-status[data-state='error'] {
+		color: #9f2d2d;
+	}
 	.result-list {
 		display: grid;
 		gap: 0.9rem;
@@ -429,6 +537,29 @@ const languages = [
 	.result-list code {
 		color: rgb(var(--black));
 		font-size: 0.95rem;
+	}
+	.value-row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.65rem;
+		align-items: center;
+	}
+	.secondary-button {
+		border: 1px solid rgb(var(--gray-light));
+		background: white;
+		padding: 0.45rem 0.65rem;
+		color: var(--accent-dark);
+		font-size: 0.85rem;
+	}
+	.secondary-button:hover {
+		border-color: var(--accent);
+		background: rgba(37, 99, 235, 0.08);
+		color: var(--accent-dark);
+	}
+	.secondary-button:disabled {
+		background: rgb(var(--gray-light));
+		color: rgb(var(--gray));
+		cursor: not-allowed;
 	}
 	@media (max-width: 780px) {
 		.subscribe-grid {
