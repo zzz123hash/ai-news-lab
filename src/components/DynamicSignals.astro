@@ -1,0 +1,179 @@
+<section class="dynamic-signals" aria-labelledby="dynamic-signals-heading" data-dynamic-signals>
+	<div class="signals-header">
+		<p class="signals-eyebrow">AI Signals</p>
+		<h2 id="dynamic-signals-heading">What to explore next</h2>
+	</div>
+	<p class="signals-status" data-signals-status>Checking for fresh signals...</p>
+	<ul class="signals-list" data-signals-list>
+		<li>Explore the latest AI briefs, prompts, and Life OS guides.</li>
+	</ul>
+</section>
+
+<script>
+	const SIGNALS_ENDPOINT = 'https://api.omnihex.xyz/public/signals';
+	const SIGNALS_TIMEOUT_MS = 3000;
+	const FALLBACK_SIGNALS = ['Explore the latest AI briefs, prompts, and Life OS guides.'];
+
+	function normalizeSignals(payload) {
+		const rawSignals = Array.isArray(payload)
+			? payload
+			: Array.isArray(payload?.signals)
+				? payload.signals
+				: [];
+
+		return rawSignals
+			.map((signal) => {
+				if (typeof signal === 'string') {
+					return signal.trim();
+				}
+
+				if (signal && typeof signal === 'object') {
+					return String(signal.title ?? signal.text ?? signal.label ?? '').trim();
+				}
+
+				return '';
+			})
+			.filter(Boolean)
+			.slice(0, 5);
+	}
+
+	function renderSignals(list, signals) {
+		list.replaceChildren(...signals.map((signal) => {
+			const item = document.createElement('li');
+			item.textContent = signal;
+
+			return item;
+		}));
+	}
+
+	async function loadSignals(root) {
+		const status = root.querySelector('[data-signals-status]');
+		const list = root.querySelector('[data-signals-list]');
+
+		if (!(status instanceof HTMLElement) || !(list instanceof HTMLElement)) {
+			return;
+		}
+
+		const controller = new AbortController();
+		const timeoutId = window.setTimeout(() => controller.abort(), SIGNALS_TIMEOUT_MS);
+
+		try {
+			const response = await fetch(SIGNALS_ENDPOINT, {
+				headers: { Accept: 'application/json' },
+				signal: controller.signal,
+			});
+
+			if (!response.ok) {
+				throw new Error(`Signals API returned ${response.status}`);
+			}
+
+			const signals = normalizeSignals(await response.json());
+
+			if (signals.length === 0) {
+				throw new Error('Signals API returned no usable signals');
+			}
+
+			renderSignals(list, signals);
+			status.textContent = 'Fresh signals loaded.';
+			root.dataset.state = 'loaded';
+		} catch {
+			renderSignals(list, FALLBACK_SIGNALS);
+			status.textContent = 'Static signals available.';
+			root.dataset.state = 'fallback';
+		} finally {
+			window.clearTimeout(timeoutId);
+		}
+	}
+
+	for (const root of document.querySelectorAll('[data-dynamic-signals]')) {
+		if (root instanceof HTMLElement) {
+			loadSignals(root);
+		}
+	}
+</script>
+
+<style>
+	.dynamic-signals {
+		border-top: 1px solid rgb(var(--gray-light));
+		border-bottom: 1px solid rgb(var(--gray-light));
+		margin: 1.5rem 0 0;
+		padding: 1.25rem 0;
+	}
+
+	.signals-header {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.5rem 1rem;
+	}
+
+	.signals-eyebrow {
+		margin: 0;
+		color: var(--accent-dark);
+		font-size: 0.9rem;
+		font-weight: 700;
+	}
+
+	.dynamic-signals h2 {
+		margin: 0;
+		font-size: 1.35rem;
+	}
+
+	.signals-status {
+		width: fit-content;
+		margin: 0.85rem 0 0;
+		border-radius: 999px;
+		background: rgb(var(--gray-light));
+		color: rgb(var(--gray));
+		font-size: 0.82rem;
+		font-weight: 700;
+		line-height: 1.2;
+		padding: 0.3rem 0.65rem;
+	}
+
+	.dynamic-signals[data-state='loaded'] .signals-status {
+		background: rgba(37, 99, 235, 0.1);
+		color: var(--accent-dark);
+	}
+
+	.signals-list {
+		display: grid;
+		gap: 0.6rem;
+		margin: 1rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.signals-list li {
+		border-left: 3px solid var(--accent);
+		padding-left: 0.75rem;
+		color: rgb(var(--gray-dark));
+	}
+
+	.dynamic-signals:not([data-state]) .signals-status::after {
+		display: inline-block;
+		width: 1.4em;
+		content: '...';
+		animation: signal-pulse 1.2s steps(3, end) infinite;
+	}
+
+	@keyframes signal-pulse {
+		0% {
+			opacity: 0.35;
+		}
+		50% {
+			opacity: 1;
+		}
+		100% {
+			opacity: 0.35;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.dynamic-signals:not([data-state]) .signals-status::after {
+			animation: none;
+			content: '';
+		}
+	}
+</style>
