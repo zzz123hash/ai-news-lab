@@ -1,0 +1,168 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+
+const title = 'OmniHex Admin';
+const description = 'An early AI editor workspace prototype for OmniHex Lab.';
+const workspaceCards = [
+	{
+		title: "Today's content ideas",
+		status: 'Placeholder',
+		description: 'Future AI recommendations for timely multilingual briefs and evergreen tutorials.',
+	},
+	{
+		title: 'Draft queue',
+		status: 'Placeholder',
+		description: 'Future review lane for generated drafts, source-backed notes, and publish-ready posts.',
+	},
+	{
+		title: 'Multilingual publishing',
+		status: 'Placeholder',
+		description: 'Future workflow for translation keys, target languages, localization, and canonical drafts.',
+	},
+	{
+		title: 'Automation status',
+		status: 'Placeholder',
+		description: 'Future monitor for source intake, AI generation runs, publishing jobs, and distribution.',
+	},
+];
+const entryActions = [
+	{ href: '/admin/new/', label: 'New Draft' },
+	{ href: '/admin/inbox/', label: 'Source Inbox' },
+	{ href: '/admin/ideas/', label: 'Content Ideas' },
+];
+---
+
+<PageLayout title={title} description={description}>
+	<section class="admin-shell">
+		<p class="prototype-warning">Prototype only. Do not share this URL publicly.</p>
+
+		<header class="admin-header">
+			<p class="eyebrow">OmniHex Admin</p>
+			<h1>AI Editor Workspace</h1>
+			<p>
+				A private prototype for collecting sources, shaping ideas, managing drafts, and preparing multilingual
+				publishing workflows for OmniHex Lab.
+			</p>
+		</header>
+
+		<nav class="entry-actions" aria-label="Admin workspace actions">
+			{entryActions.map((action) => <a href={action.href}>{action.label}</a>)}
+		</nav>
+
+		<section class="workspace-grid" aria-label="Admin workspace overview">
+			{workspaceCards.map((card) => (
+				<article class="workspace-card">
+					<div>
+						<h2>{card.title}</h2>
+						<p>{card.description}</p>
+					</div>
+					<span>{card.status}</span>
+				</article>
+			))}
+		</section>
+	</section>
+</PageLayout>
+
+<style>
+	.admin-shell {
+		display: grid;
+		gap: 1.5rem;
+	}
+
+	.prototype-warning {
+		margin: 0;
+		border: 1px solid #f59e0b;
+		border-radius: 8px;
+		background: #fffbeb;
+		color: #92400e;
+		font-size: 0.95rem;
+		font-weight: 700;
+		padding: 0.7rem 0.9rem;
+	}
+
+	.admin-header {
+		border-bottom: 1px solid rgb(var(--gray-light));
+		padding-bottom: 1.25rem;
+	}
+
+	.eyebrow {
+		margin: 0 0 0.4rem;
+		color: var(--accent-dark);
+		font-weight: 700;
+	}
+
+	.admin-header h1 {
+		font-size: clamp(2rem, 4vw, 3.2rem);
+	}
+
+	.admin-header p:last-child {
+		max-width: 760px;
+		color: rgb(var(--gray));
+		font-size: 1.06rem;
+	}
+
+	.entry-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+	}
+
+	.entry-actions a {
+		border-radius: 6px;
+		background: var(--accent);
+		color: #fff;
+		font-weight: 700;
+		line-height: 1.2;
+		padding: 0.75rem 1rem;
+		text-decoration: none;
+	}
+
+	.entry-actions a:hover {
+		background: var(--accent-dark);
+		color: #fff;
+	}
+
+	.workspace-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 1rem;
+	}
+
+	.workspace-card {
+		display: grid;
+		gap: 1rem;
+		align-content: space-between;
+		min-height: 190px;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.92);
+		box-shadow: 0 10px 30px rgba(var(--black), 6%);
+		padding: 1rem;
+	}
+
+	.workspace-card h2 {
+		font-size: 1.25rem;
+	}
+
+	.workspace-card p {
+		color: rgb(var(--gray));
+		font-size: 0.96rem;
+	}
+
+	.workspace-card span {
+		width: fit-content;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 999px;
+		color: rgb(var(--gray));
+		font-size: 0.82rem;
+		font-weight: 700;
+		line-height: 1.2;
+		padding: 0.3rem 0.65rem;
+	}
+
+	@media (max-width: 760px) {
+		.workspace-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

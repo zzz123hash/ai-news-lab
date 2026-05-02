@@ -1,0 +1,200 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+
+const title = 'OmniHex Admin - Content Ideas';
+const description = 'Mock AI content ideas for the OmniHex Lab admin prototype.';
+const ideas = [
+	{
+		title: 'Weekly AI agent news brief for operators',
+		category: 'briefs',
+		languages: 'en, zh, id',
+		commercialValue: 'Medium',
+		seoPotential: 'High',
+		status: 'Mock idea',
+	},
+	{
+		title: 'Prompt pack for turning sources into short tutorials',
+		category: 'prompts',
+		languages: 'en, pt, es',
+		commercialValue: 'High',
+		seoPotential: 'Medium',
+		status: 'Mock idea',
+	},
+	{
+		title: 'How to build a low-cost AI content workflow',
+		category: 'tutorials',
+		languages: 'en, zh, vi',
+		commercialValue: 'High',
+		seoPotential: 'High',
+		status: 'Mock idea',
+	},
+	{
+		title: 'Life OS weekly reset with AI coaching prompts',
+		category: 'life',
+		languages: 'en, id, es',
+		commercialValue: 'Medium',
+		seoPotential: 'Medium',
+		status: 'Mock idea',
+	},
+	{
+		title: 'Beginner guide to AI-native publishing systems',
+		category: 'ai',
+		languages: 'en, zh, tr',
+		commercialValue: 'Medium',
+		seoPotential: 'High',
+		status: 'Mock idea',
+	},
+];
+---
+
+<PageLayout title={title} description={description}>
+	<section class="admin-shell">
+		<p class="prototype-warning">Prototype only. Do not share this URL publicly.</p>
+
+		<header class="admin-header">
+			<p class="eyebrow">Content Ideas</p>
+			<h1>AI Recommended Topics</h1>
+			<p>
+				Mock recommendation cards for a future idea engine that ranks topics by relevance, language fit,
+				commercial value, and SEO potential.
+			</p>
+		</header>
+
+		<section class="ideas-grid" aria-label="Mock content ideas">
+			{ideas.map((idea) => (
+				<article class="idea-card">
+					<div>
+						<p class="idea-status">{idea.status}</p>
+						<h2>{idea.title}</h2>
+					</div>
+					<dl>
+						<div>
+							<dt>suggested category</dt>
+							<dd>{idea.category}</dd>
+						</div>
+						<div>
+							<dt>suggested languages</dt>
+							<dd>{idea.languages}</dd>
+						</div>
+						<div>
+							<dt>commercial value</dt>
+							<dd>{idea.commercialValue}</dd>
+						</div>
+						<div>
+							<dt>SEO potential</dt>
+							<dd>{idea.seoPotential}</dd>
+						</div>
+						<div>
+							<dt>status</dt>
+							<dd>{idea.status}</dd>
+						</div>
+					</dl>
+				</article>
+			))}
+		</section>
+	</section>
+</PageLayout>
+
+<style>
+	.admin-shell {
+		display: grid;
+		gap: 1.5rem;
+	}
+
+	.prototype-warning {
+		margin: 0;
+		border: 1px solid #f59e0b;
+		border-radius: 8px;
+		background: #fffbeb;
+		color: #92400e;
+		font-size: 0.95rem;
+		font-weight: 700;
+		padding: 0.7rem 0.9rem;
+	}
+
+	.admin-header {
+		border-bottom: 1px solid rgb(var(--gray-light));
+		padding-bottom: 1.25rem;
+	}
+
+	.eyebrow {
+		margin: 0 0 0.4rem;
+		color: var(--accent-dark);
+		font-weight: 700;
+	}
+
+	.admin-header h1 {
+		font-size: clamp(2rem, 4vw, 3.2rem);
+	}
+
+	.admin-header p:last-child {
+		max-width: 780px;
+		color: rgb(var(--gray));
+		font-size: 1.06rem;
+	}
+
+	.ideas-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 1rem;
+	}
+
+	.idea-card {
+		display: grid;
+		gap: 1rem;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.92);
+		box-shadow: 0 10px 30px rgba(var(--black), 6%);
+		padding: 1rem;
+	}
+
+	.idea-card h2 {
+		font-size: 1.25rem;
+	}
+
+	.idea-status {
+		width: fit-content;
+		margin: 0 0 0.55rem;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 999px;
+		color: rgb(var(--gray));
+		font-size: 0.82rem;
+		font-weight: 700;
+		line-height: 1.2;
+		padding: 0.3rem 0.65rem;
+	}
+
+	dl {
+		display: grid;
+		gap: 0.7rem;
+		margin: 0;
+	}
+
+	dl div {
+		display: grid;
+		gap: 0.1rem;
+		border-top: 1px solid rgb(var(--gray-light));
+		padding-top: 0.65rem;
+	}
+
+	dt {
+		color: rgb(var(--gray));
+		font-size: 0.78rem;
+		font-weight: 700;
+		letter-spacing: 0;
+		text-transform: uppercase;
+	}
+
+	dd {
+		margin: 0;
+		color: rgb(var(--gray-dark));
+		font-size: 0.96rem;
+	}
+
+	@media (max-width: 760px) {
+		.ideas-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

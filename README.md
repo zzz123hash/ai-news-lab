@@ -112,12 +112,15 @@ npm run build
 
 The production output is generated in `dist/`.
 
-## Admin Prototype
+## OmniHex Admin Prototype
 
-- `/admin/new` is an early private publishing form.
-- It posts to `/api/posts`.
+- This is an early AI editor workspace prototype.
+- `/admin` is a private admin workspace entry point.
+- `/admin/new` posts single-language drafts to `/api/posts`.
+- `/admin/inbox` and `/admin/ideas` are UI-only placeholders.
 - It does not store tokens.
-- Real authentication and AI generation will be added later.
+- AI generation, source collection, user personalization, and paid features will be added later.
+- Current publishing boundary is `POST /api/posts`.
 
 ## Cloudflare Pages Deployment
 
