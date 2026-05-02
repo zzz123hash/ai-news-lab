@@ -1,4 +1,10 @@
-import { getPublishedPosts, getPostUrl } from '../../../utils/posts';
+import {
+	getPostKeywords,
+	getPostSeoDescription,
+	getPostSeoTitle,
+	getPostUrl,
+	getPublishedPosts,
+} from '../../../utils/posts';
 
 export async function GET() {
 	const posts = await getPublishedPosts();
@@ -8,6 +14,14 @@ export async function GET() {
 			posts.map((post) => ({
 				title: post.data.title,
 				description: post.data.description,
+				seoTitle: post.data.seoTitle ?? null,
+				seoDescription: post.data.seoDescription ?? null,
+				effectiveSeoTitle: getPostSeoTitle(post),
+				effectiveSeoDescription: getPostSeoDescription(post),
+				targetQuery: post.data.targetQuery ?? null,
+				keywords: post.data.keywords,
+				effectiveKeywords: getPostKeywords(post),
+				searchIntent: post.data.searchIntent ?? null,
 				pubDate: post.data.pubDate.toISOString().slice(0, 10),
 				category: post.data.category,
 				language: post.data.language,
@@ -32,4 +46,3 @@ export async function GET() {
 		},
 	);
 }
-

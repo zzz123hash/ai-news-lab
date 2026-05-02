@@ -9,13 +9,35 @@ interface Props {
 	title: string;
 	description: string;
 	type?: 'website' | 'article';
+	canonicalUrl?: string | URL;
+	keywords?: string[];
+	alternateLanguages?: {
+		hreflang: string;
+		href: string;
+	}[];
 }
 
-const { title, description, type = 'website' } = Astro.props;
-const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
+const {
+	title,
+	description,
+	type = 'website',
+	canonicalUrl,
+	keywords = [],
+	alternateLanguages = [],
+} = Astro.props;
+const canonicalURL = canonicalUrl
+	? new URL(canonicalUrl.toString(), Astro.site).toString()
+	: new URL(Astro.url.pathname, Astro.site).toString();
 const cleanTitle = title.trim() || SITE_TITLE;
 const cleanDescription = description.trim() || 'Multilingual AI briefs, practical prompts, and life operating guides.';
 const pageTitle = cleanTitle === SITE_TITLE ? cleanTitle : `${cleanTitle} | ${SITE_TITLE}`;
+const cleanKeywords = [...new Set(keywords.map((keyword) => keyword.trim()).filter(Boolean))];
+const cleanAlternateLanguages = alternateLanguages
+	.map((alternate) => ({
+		hreflang: alternate.hreflang.trim(),
+		href: new URL(alternate.href, Astro.site).toString(),
+	}))
+	.filter((alternate) => alternate.hreflang && alternate.href);
 ---
 
 <!-- Global Metadata -->
@@ -37,11 +59,17 @@ const pageTitle = cleanTitle === SITE_TITLE ? cleanTitle : `${cleanTitle} | ${SI
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
+{
+	cleanAlternateLanguages.map((alternate) => (
+		<link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />
+	))
+}
 
 <!-- Primary Meta Tags -->
 <title>{pageTitle}</title>
 <meta name="title" content={pageTitle} />
 <meta name="description" content={cleanDescription} />
+{cleanKeywords.length > 0 && <meta name="keywords" content={cleanKeywords.join(', ')} />}
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content={type} />

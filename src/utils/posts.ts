@@ -4,6 +4,11 @@ export type BlogPost = CollectionEntry<'posts'>;
 export const LANGUAGE_SWITCHER_ORDER = ['en', 'zh', 'id', 'pt', 'es', 'vi'] as const;
 const REPRESENTATIVE_LANGUAGE_PRIORITY = ['en', 'zh'] as const;
 
+export interface AlternateLanguageLink {
+	hreflang: string;
+	href: string;
+}
+
 export async function getPublishedPosts() {
 	const posts = await getCollection('posts', ({ data }) => !data.draft);
 
@@ -67,6 +72,43 @@ export function selectRepresentativePost(posts: BlogPost[]) {
 
 export function getPostUrl(post: BlogPost) {
 	return `/${post.data.category}/${post.id}/`;
+}
+
+export function getPostCanonicalUrl(post: BlogPost, site: string | URL) {
+	return new URL(getPostUrl(post), site).toString();
+}
+
+export function getPostSeoTitle(post: BlogPost) {
+	return post.data.seoTitle?.trim() || post.data.title;
+}
+
+export function getPostSeoDescription(post: BlogPost) {
+	return post.data.seoDescription?.trim() || post.data.description;
+}
+
+export function getPostKeywords(post: BlogPost) {
+	return post.data.keywords.length > 0 ? post.data.keywords : post.data.tags;
+}
+
+export function getPostAlternateLanguageLinks(post: BlogPost, translations: BlogPost[], site: string | URL) {
+	const relatedPosts = translations.length > 0 ? translations : [post];
+	const links = sortPostsByLanguageOrder(relatedPosts).map((translation) => ({
+		hreflang: translation.data.language,
+		href: getPostCanonicalUrl(translation, site),
+	}));
+	const defaultPost =
+		relatedPosts.find(
+			(translation) => normalizeLanguage(translation.data.language) === normalizeLanguage(post.data.canonicalLanguage),
+		) ?? relatedPosts[0];
+
+	if (defaultPost) {
+		links.push({
+			hreflang: 'x-default',
+			href: getPostCanonicalUrl(defaultPost, site),
+		});
+	}
+
+	return links;
 }
 
 function getRepresentativeLanguagePriority(language: string) {

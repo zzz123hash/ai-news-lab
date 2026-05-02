@@ -6,7 +6,14 @@ import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import { getCategoryBySlug, getLanguageName, SITE_TITLE } from '../consts';
-import { getPostUrl } from '../utils/posts';
+import {
+	getPostAlternateLanguageLinks,
+	getPostCanonicalUrl,
+	getPostKeywords,
+	getPostSeoDescription,
+	getPostSeoTitle,
+	getPostUrl,
+} from '../utils/posts';
 
 interface Props {
 	post: CollectionEntry<'posts'>;
@@ -24,23 +31,33 @@ const {
 	language,
 	source,
 	sourceUrl,
+	targetQuery,
 	bookTitle,
 	bookAuthor,
 	bookCategory,
 } = post.data;
 const currentCategory = getCategoryBySlug(category);
 const toc = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3);
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const canonicalURL = getPostCanonicalUrl(post, Astro.site);
 const hasBookInfo = bookTitle || bookAuthor || bookCategory;
 const hasTranslations = post.data.translationKey && translations.length > 1;
+const alternateLanguages = hasTranslations ? getPostAlternateLanguageLinks(post, translations, Astro.site) : [];
+const seoTitle = getPostSeoTitle(post);
+const seoDescription = getPostSeoDescription(post);
+const seoKeywords = getPostKeywords(post);
 const articleJsonLd = {
 	'@context': 'https://schema.org',
 	'@type': 'Article',
-	headline: title,
-	description,
+	headline: seoTitle,
+	name: title,
+	description: seoDescription,
 	inLanguage: language,
 	datePublished: pubDate.toISOString(),
-	mainEntityOfPage: canonicalURL.toString(),
+	url: canonicalURL,
+	mainEntityOfPage: {
+		'@type': 'WebPage',
+		'@id': canonicalURL,
+	},
 	author: {
 		'@type': 'Organization',
 		name: SITE_TITLE,
@@ -49,7 +66,9 @@ const articleJsonLd = {
 		'@type': 'Organization',
 		name: SITE_TITLE,
 	},
-	keywords: tags,
+	articleSection: currentCategory?.name ?? category,
+	keywords: seoKeywords,
+	about: targetQuery ? { '@type': 'Thing', name: targetQuery } : undefined,
 	isBasedOn: sourceUrl,
 };
 ---
@@ -57,7 +76,14 @@ const articleJsonLd = {
 <!doctype html>
 <html lang={language}>
 	<head>
-		<BaseHead title={title} description={description} type="article" />
+		<BaseHead
+			title={seoTitle}
+			description={seoDescription}
+			type="article"
+			canonicalUrl={canonicalURL}
+			keywords={seoKeywords}
+			alternateLanguages={alternateLanguages}
+		/>
 		<script type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} />
 		<style>
 			main {

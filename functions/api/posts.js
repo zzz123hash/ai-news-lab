@@ -55,6 +55,11 @@ export async function onRequestPost({ request, env }) {
 			bookTitle: post.bookTitle ?? null,
 			bookAuthor: post.bookAuthor ?? null,
 			bookCategory: post.bookCategory ?? null,
+			seoTitle: post.seoTitle ?? null,
+			seoDescription: post.seoDescription ?? null,
+			targetQuery: post.targetQuery ?? null,
+			keywords: post.keywords,
+			searchIntent: post.searchIntent ?? null,
 		});
 	} catch (error) {
 		return json({ ok: false, error: error instanceof Error ? error.message : 'Unexpected error' }, 500);
@@ -113,6 +118,12 @@ function validatePostBody(body) {
 		return { ok: false, error: 'tags must be an array of strings' };
 	}
 
+	const keywords = body.keywords === undefined ? [] : body.keywords;
+
+	if (!Array.isArray(keywords) || keywords.some((keyword) => typeof keyword !== 'string')) {
+		return { ok: false, error: 'keywords must be an array of strings' };
+	}
+
 	if (body.source !== undefined && typeof body.source !== 'string') {
 		return { ok: false, error: 'source must be a string' };
 	}
@@ -134,6 +145,10 @@ function validatePostBody(body) {
 	}
 
 	for (const field of [
+		'seoTitle',
+		'seoDescription',
+		'targetQuery',
+		'searchIntent',
 		'translationKey',
 		'canonicalLanguage',
 		'originalLanguage',
@@ -154,6 +169,11 @@ function validatePostBody(body) {
 			category,
 			language: body.language.trim(),
 			tags: tags.map((tag) => tag.trim()).filter(Boolean),
+			seoTitle: body.seoTitle?.trim(),
+			seoDescription: body.seoDescription?.trim(),
+			targetQuery: body.targetQuery?.trim(),
+			keywords: keywords.map((keyword) => keyword.trim()).filter(Boolean),
+			searchIntent: body.searchIntent?.trim(),
 			source: body.source?.trim(),
 			sourceUrl: body.sourceUrl?.trim(),
 			translationKey: body.translationKey?.trim(),
@@ -177,6 +197,26 @@ function createMarkdown(post, date) {
 		`language: ${JSON.stringify(post.language)}`,
 		`tags: ${JSON.stringify(post.tags)}`,
 	];
+
+	if (post.seoTitle) {
+		frontmatter.push(`seoTitle: ${JSON.stringify(post.seoTitle)}`);
+	}
+
+	if (post.seoDescription) {
+		frontmatter.push(`seoDescription: ${JSON.stringify(post.seoDescription)}`);
+	}
+
+	if (post.targetQuery) {
+		frontmatter.push(`targetQuery: ${JSON.stringify(post.targetQuery)}`);
+	}
+
+	if (post.keywords.length > 0) {
+		frontmatter.push(`keywords: ${JSON.stringify(post.keywords)}`);
+	}
+
+	if (post.searchIntent) {
+		frontmatter.push(`searchIntent: ${JSON.stringify(post.searchIntent)}`);
+	}
 
 	if (post.source) {
 		frontmatter.push(`source: ${JSON.stringify(post.source)}`);
