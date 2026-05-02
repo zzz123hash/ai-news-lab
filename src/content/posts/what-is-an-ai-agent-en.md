@@ -7,6 +7,9 @@ tags: ["AI Agent", "AI", "Automation"]
 language: "en"
 source: "OmniHex Lab"
 sourceUrl: "https://lab.omnihex.xyz"
+translationKey: "what-is-ai-agent"
+canonicalLanguage: "en"
+originalLanguage: "en"
 draft: false
 ---
 

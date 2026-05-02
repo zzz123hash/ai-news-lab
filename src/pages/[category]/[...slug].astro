@@ -2,6 +2,8 @@
 import { type CollectionEntry, getCollection, render } from 'astro:content';
 import BlogPost from '../../layouts/BlogPost.astro';
 
+const LANGUAGE_SWITCHER_ORDER = ['en', 'zh', 'id', 'pt', 'es', 'vi'];
+
 export async function getStaticPaths() {
 	const posts = await getCollection('posts', ({ data }) => !data.draft);
 
@@ -17,8 +19,21 @@ interface Props {
 
 const { post } = Astro.props;
 const { Content, headings } = await render(post);
+const translations = post.data.translationKey
+	? (await getCollection(
+			'posts',
+			({ data }) => !data.draft && data.translationKey === post.data.translationKey,
+		)).sort((a, b) => getLanguageSortOrder(a.data.language) - getLanguageSortOrder(b.data.language))
+	: [];
+
+function getLanguageSortOrder(language: string) {
+	const normalizedLanguage = language.toLowerCase().split(/[-_]/)[0];
+	const order = LANGUAGE_SWITCHER_ORDER.indexOf(normalizedLanguage);
+
+	return order === -1 ? LANGUAGE_SWITCHER_ORDER.length : order;
+}
 ---
 
-<BlogPost post={post} headings={headings}>
+<BlogPost post={post} headings={headings} translations={translations}>
 	<Content />
 </BlogPost>

@@ -2,9 +2,9 @@
 import PostList from '../../components/PostList.astro';
 import { getLanguageName } from '../../consts';
 import PageLayout from '../../layouts/PageLayout.astro';
-import { getPublishedPosts } from '../../utils/posts';
+import { getRepresentativePosts } from '../../utils/posts';
 
-const briefs = (await getPublishedPosts()).filter((post) => post.data.category === 'briefs');
+const briefs = (await getRepresentativePosts()).filter((post) => post.data.category === 'briefs');
 const languages = [...new Set(briefs.map((post) => post.data.language))].sort();
 ---
 

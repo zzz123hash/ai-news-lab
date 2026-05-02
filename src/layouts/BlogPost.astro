@@ -6,13 +6,15 @@ import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import { getCategoryBySlug, getLanguageName, SITE_TITLE } from '../consts';
+import { getPostUrl } from '../utils/posts';
 
 interface Props {
 	post: CollectionEntry<'posts'>;
 	headings: MarkdownHeading[];
+	translations?: CollectionEntry<'posts'>[];
 }
 
-const { post, headings } = Astro.props;
+const { post, headings, translations = [] } = Astro.props;
 const {
 	title,
 	description,
@@ -30,6 +32,7 @@ const currentCategory = getCategoryBySlug(category);
 const toc = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3);
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const hasBookInfo = bookTitle || bookAuthor || bookCategory;
+const hasTranslations = post.data.translationKey && translations.length > 1;
 const articleJsonLd = {
 	'@context': 'https://schema.org',
 	'@type': 'Article',
@@ -91,6 +94,38 @@ const articleJsonLd = {
 			}
 			.source {
 				margin-top: 0.75rem;
+			}
+			.language-switcher {
+				margin-top: 1rem;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 8px;
+				padding: 0.85rem 1rem;
+				background: white;
+			}
+			.language-switcher h2 {
+				margin: 0 0 0.5rem;
+				font-size: 1rem;
+			}
+			.language-switcher ul {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+				margin: 0;
+				padding: 0;
+				list-style: none;
+			}
+			.language-switcher a {
+				display: inline-flex;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 999px;
+				padding: 0.2rem 0.65rem;
+				text-decoration: none;
+				font-size: 0.9rem;
+			}
+			.language-switcher a.active {
+				border-color: var(--accent);
+				background: var(--accent);
+				color: white;
 			}
 			.book-info {
 				display: grid;
@@ -207,6 +242,25 @@ const articleJsonLd = {
 							<span>{getLanguageName(language)}</span>
 							<span>{tags.length} tags</span>
 						</div>
+						{
+							hasTranslations && (
+								<nav class="language-switcher" aria-labelledby="language-switcher-heading">
+									<h2 id="language-switcher-heading">Languages</h2>
+									<ul>
+										{translations.map((translation) => (
+											<li>
+												<a
+													class={translation.id === post.id ? 'active' : undefined}
+													href={getPostUrl(translation)}
+												>
+													{getLanguageName(translation.data.language)}
+												</a>
+											</li>
+										))}
+									</ul>
+								</nav>
+							)
+						}
 						{
 							source && (
 								<div class="source">

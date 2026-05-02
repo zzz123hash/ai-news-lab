@@ -70,10 +70,12 @@ export const NAV_LINKS = [
 
 export const LANGUAGE_NAMES: Record<string, string> = {
 	'zh-CN': '中文',
+	zh: '中文',
 	en: 'English',
 	id: 'Bahasa Indonesia',
 	pt: 'Português',
 	es: 'Español',
+	vi: 'Tiếng Việt',
 };
 
 export type CategorySlug = (typeof CATEGORIES)[number]['slug'];

@@ -2,9 +2,9 @@
 import PostList from '../components/PostList.astro';
 import { CATEGORIES, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import PageLayout from '../layouts/PageLayout.astro';
-import { getPublishedPosts } from '../utils/posts';
+import { getRepresentativePosts } from '../utils/posts';
 
-const posts = await getPublishedPosts();
+const posts = await getRepresentativePosts();
 const briefs = posts.filter((post) => post.data.category === 'briefs').slice(0, 6);
 const latestArticles = posts.filter((post) => post.data.category !== 'briefs').slice(0, 8);
 ---

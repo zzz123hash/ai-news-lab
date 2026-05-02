@@ -2,7 +2,7 @@
 import PostList from '../../components/PostList.astro';
 import { CATEGORIES } from '../../consts';
 import PageLayout from '../../layouts/PageLayout.astro';
-import { getPublishedPosts } from '../../utils/posts';
+import { getRepresentativePosts } from '../../utils/posts';
 
 export function getStaticPaths() {
 	return CATEGORIES.filter((category) => category.slug !== 'briefs').map((category) => ({
@@ -16,7 +16,7 @@ interface Props {
 }
 
 const { category } = Astro.props;
-const posts = (await getPublishedPosts()).filter((post) => post.data.category === category.slug);
+const posts = (await getRepresentativePosts()).filter((post) => post.data.category === category.slug);
 const showProductFeature = category.slug === 'products';
 const showBooksIntro = category.slug === 'books';
 ---

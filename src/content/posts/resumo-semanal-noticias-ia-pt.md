@@ -7,6 +7,9 @@ tags: ["IA", "Notícias de IA", "Resumo semanal"]
 language: "pt"
 source: "OmniHex Lab"
 sourceUrl: "https://lab.omnihex.xyz"
+translationKey: "weekly-ai-news-brief"
+canonicalLanguage: "en"
+originalLanguage: "id"
 draft: false
 ---
 

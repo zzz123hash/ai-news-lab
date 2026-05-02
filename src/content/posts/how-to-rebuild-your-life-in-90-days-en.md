@@ -7,6 +7,9 @@ tags: ["Life OS", "Self Improvement", "90 Day Reset"]
 language: "en"
 source: "OmniHex Lab"
 sourceUrl: "https://lab.omnihex.xyz"
+translationKey: "90-day-life-reset-guide"
+canonicalLanguage: "en"
+originalLanguage: "en"
 draft: false
 ---
 

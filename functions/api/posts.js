@@ -49,6 +49,9 @@ export async function onRequestPost({ request, env }) {
 			path,
 			slug,
 			draft: post.draft,
+			translationKey: post.translationKey ?? null,
+			canonicalLanguage: post.canonicalLanguage,
+			originalLanguage: post.originalLanguage ?? null,
 			bookTitle: post.bookTitle ?? null,
 			bookAuthor: post.bookAuthor ?? null,
 			bookCategory: post.bookCategory ?? null,
@@ -130,7 +133,14 @@ function validatePostBody(body) {
 		return { ok: false, error: 'draft must be a boolean' };
 	}
 
-	for (const field of ['bookTitle', 'bookAuthor', 'bookCategory']) {
+	for (const field of [
+		'translationKey',
+		'canonicalLanguage',
+		'originalLanguage',
+		'bookTitle',
+		'bookAuthor',
+		'bookCategory',
+	]) {
 		if (body[field] !== undefined && typeof body[field] !== 'string') {
 			return { ok: false, error: `${field} must be a string` };
 		}
@@ -146,6 +156,9 @@ function validatePostBody(body) {
 			tags: tags.map((tag) => tag.trim()).filter(Boolean),
 			source: body.source?.trim(),
 			sourceUrl: body.sourceUrl?.trim(),
+			translationKey: body.translationKey?.trim(),
+			canonicalLanguage: body.canonicalLanguage?.trim() || 'en',
+			originalLanguage: body.originalLanguage?.trim(),
 			bookTitle: body.bookTitle?.trim(),
 			bookAuthor: body.bookAuthor?.trim(),
 			bookCategory: body.bookCategory?.trim(),
@@ -171,6 +184,18 @@ function createMarkdown(post, date) {
 
 	if (post.sourceUrl) {
 		frontmatter.push(`sourceUrl: ${JSON.stringify(post.sourceUrl)}`);
+	}
+
+	if (post.translationKey) {
+		frontmatter.push(`translationKey: ${JSON.stringify(post.translationKey)}`);
+	}
+
+	if (post.canonicalLanguage) {
+		frontmatter.push(`canonicalLanguage: ${JSON.stringify(post.canonicalLanguage)}`);
+	}
+
+	if (post.originalLanguage) {
+		frontmatter.push(`originalLanguage: ${JSON.stringify(post.originalLanguage)}`);
 	}
 
 	if (post.bookTitle) {
